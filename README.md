@@ -133,7 +133,7 @@ services:
 
 ```
 /data/
-├── fileshare.db    # SQLite database
+├── safedrop.db    # SQLite database
 ├── files/          # Stored (optionally encrypted) files
 └── chunks/         # Temporary upload chunks
 ```
@@ -146,10 +146,10 @@ The `compose.yml` is pre-configured for Synology DSM. Volumes are mounted from t
 
 ```yaml
 volumes:
-  - /volume2/docker/fileshare/data:/data
-  - /volume2/docker/fileshare/public:/app/public
-  - /volume2/docker/fileshare/server.js:/app/server.js
-  - /volume2/docker/fileshare/package.json:/app/package.json
+  - /volume2/docker/safedrop/data:/data
+  - /volume2/docker/safedrop/public:/app/public
+  - /volume2/docker/safedrop/server.js:/app/server.js
+  - /volume2/docker/safedrop/package.json:/app/package.json
 ```
 
 ---

@@ -773,6 +773,8 @@
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <div style="display:flex;gap:4px">
             <button class="act-btn tlog-filter-btn active" data-filter="all">All</button>
+            <button class="act-btn tlog-filter-btn" data-filter="active">Active</button>
+            <button class="act-btn tlog-filter-btn" data-filter="inactive">Deleted / Expired</button>
             <button class="act-btn tlog-filter-btn" data-filter="user">Users</button>
             <button class="act-btn tlog-filter-btn" data-filter="guest">Guests</button>
           </div>
@@ -793,11 +795,12 @@
               <th class="sortable" data-col="expires_at"     data-table="transfers">Expires<i class="sort-icon">⇅</i></th>
               <th class="sortable" data-col="download_count" data-table="transfers">Downloads<i class="sort-icon">⇅</i></th>
               <th>IP address</th>
+              <th class="sortable" data-col="status"         data-table="transfers">Status<i class="sort-icon">⇅</i></th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="transfers-tbody">
-            <tr class="empty-row"><td colspan="8">Loading …</td></tr>
+            <tr class="empty-row"><td colspan="9">Loading …</td></tr>
           </tbody>
         </table>
       </div>
@@ -1482,22 +1485,40 @@ function renderTransfersTable() {
   updateSortHeaders('#tab-transfers table', _transfersSort);
 
   let data = _transfersData;
-  if (_transfersFilter === 'guest') data = data.filter(f => f.is_guest);
-  if (_transfersFilter === 'user')  data = data.filter(f => !f.is_guest);
+  if (_transfersFilter === 'guest')    data = data.filter(f => f.is_guest);
+  if (_transfersFilter === 'user')     data = data.filter(f => !f.is_guest);
+  if (_transfersFilter === 'active')   data = data.filter(f => f.status === 'active');
+  if (_transfersFilter === 'inactive') data = data.filter(f => f.status !== 'active');
 
   if (!data.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">${_transfersFilter !== 'all' ? 'No matching entries' : 'No transfers yet'}</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="9">${_transfersFilter !== 'all' ? 'No matching entries' : 'No transfers yet'}</td></tr>`;
     return;
   }
 
   const sorted = sortData(data, _transfersSort.col, _transfersSort.dir);
   const now = Date.now();
   tbody.innerHTML = sorted.map(f => {
-    const expired  = f.expires_at < now;
+    const isActive  = f.status === 'active';
+    const isDeleted = f.status === 'deleted';
+    const isExpired = f.status === 'expired';
+
     const unlim    = f.expires_at > now + 50*365*24*3600*1000;
-    const expLabel = unlim ? '∞ Unbegrenzt' : fmtDate(f.expires_at);
+    const expLabel = isDeleted
+      ? `<span style="color:var(--mt)">—</span>`
+      : (isExpired
+          ? `<span style="color:var(--err)">⏰ ${fmtDate(f.expires_at)}</span>`
+          : (unlim ? '∞ Unlimited' : fmtDate(f.expires_at)));
+
+    const statusBadge = isActive
+      ? '<span class="badge" style="background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.2)">● Active</span>'
+      : isDeleted
+        ? '<span class="badge" style="background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2)">🗑 Deleted</span>'
+        : '<span class="badge" style="background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.2)">⏰ Expired</span>';
+
     const guestBadge = f.is_guest ? ' <span class="badge" style="background:rgba(245,158,11,.12);color:#d97706;border:1px solid rgba(245,158,11,.3)">Guest</span>' : '';
-    return `<tr>
+    const rowStyle   = isActive ? '' : 'opacity:.65';
+
+    return `<tr style="${rowStyle}">
       <td>
         <div style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(f.original_name)}">${esc(f.original_name)}</div>
         ${f.encrypted ? '<span class="badge badge-enc">🔒 Encrypted</span>' : ''}
@@ -1505,16 +1526,19 @@ function renderTransfersTable() {
       <td class="mono">${esc(f.uploader || '—')}${guestBadge}</td>
       <td class="mono">${fmtBytes(f.size)}</td>
       <td class="mono">${fmtDate(f.created_at)}</td>
-      <td class="mono" style="${expired ? 'color:var(--err)' : ''}">${expired ? '⏰ Expired' : expLabel}</td>
+      <td class="mono">${expLabel}</td>
       <td class="mono">${f.download_count}${f.max_downloads ? ' / ' + f.max_downloads : ''}</td>
       <td class="mono" style="color:var(--mt);font-size:.72rem">${esc(f.uploader_ip || '—')}</td>
+      <td>${statusBadge}</td>
       <td>
         <div class="actions">
+          ${isActive ? `
           <button class="act-btn" onclick="adminDownload('${esc(f.id)}','${esc(f.original_name)}',${f.encrypted ? 1 : 0})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Download
           </button>
           <button class="act-btn danger" onclick="deleteTransfer('${esc(f.id)}','${esc(f.original_name)}')">Delete</button>
+          ` : '<span style="color:var(--mt);font-size:.72rem">—</span>'}
         </div>
       </td>
     </tr>`;

@@ -15,7 +15,7 @@ const PORT = parseInt(process.env.PORT || '3000');
 const DATA_DIR = process.env.DATA_DIR || '/data';
 const FILES_DIR = path.join(DATA_DIR, 'files');
 const CHUNKS_DIR = path.join(DATA_DIR, 'chunks');
-const DB_PATH = path.join(DATA_DIR, 'fileshare.db');
+const DB_PATH = path.join(DATA_DIR, 'safedrop.db');
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
 
 [DATA_DIR, FILES_DIR, CHUNKS_DIR].forEach(d => fs.mkdirSync(d, { recursive: true }));
@@ -125,6 +125,24 @@ db.exec(`
     passphrase_hash TEXT,
     passphrase_salt TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS transfer_log (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    file_id        TEXT    NOT NULL UNIQUE,
+    original_name  TEXT    NOT NULL,
+    size           INTEGER NOT NULL DEFAULT 0,
+    encrypted      INTEGER NOT NULL DEFAULT 0,
+    created_at     INTEGER NOT NULL,
+    expires_at     INTEGER NOT NULL,
+    max_downloads  INTEGER NOT NULL DEFAULT 0,
+    download_count INTEGER NOT NULL DEFAULT 0,
+    uploader_ip    TEXT,
+    user_id        TEXT,
+    uploader       TEXT,
+    is_guest       INTEGER NOT NULL DEFAULT 0,
+    status         TEXT    NOT NULL DEFAULT 'active',
+    deleted_at     INTEGER
+  );
 `);
 
 // ── Seed default settings ─────────────────────────────────────────────────────
@@ -144,6 +162,23 @@ const _migrations = [
   'ALTER TABLE files ADD COLUMN uploader_ip TEXT',
 ];
 for (const m of _migrations) { try { db.exec(m); } catch (_) {} }
+
+// Seed transfer_log from existing files (one-time migration for upgrades)
+try {
+  db.prepare(`
+    INSERT OR IGNORE INTO transfer_log
+      (file_id, original_name, size, encrypted, created_at, expires_at,
+       max_downloads, download_count, uploader_ip, user_id, uploader, is_guest, status)
+    SELECT
+      f.id, f.original_name, f.size, f.encrypted, f.created_at, f.expires_at,
+      f.max_downloads, f.download_count, f.uploader_ip, f.user_id,
+      COALESCE(u.username, 'Guest'),
+      CASE WHEN f.user_id IS NULL THEN 1 ELSE 0 END,
+      CASE WHEN f.expires_at < ? THEN 'expired' ELSE 'active' END
+    FROM files f
+    LEFT JOIN users u ON u.id = f.user_id
+  `).run(Date.now());
+} catch (_) {}
 
 // ── Settings helpers ──────────────────────────────────────────────────────────
 
@@ -482,6 +517,22 @@ app.post('/api/upload/finalize', requireAuth, async (req, res) => {
       uploaderIp
     );
 
+    // Mirror upload into transfer_log for persistent history
+    db.prepare(`
+      INSERT OR IGNORE INTO transfer_log
+        (file_id, original_name, size, encrypted, created_at, expires_at,
+         max_downloads, download_count, uploader_ip, user_id, uploader, is_guest, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, 'active')
+    `).run(
+      fileId, session.original_name, size, encrypted,
+      now,
+      session.expires_in === 0 ? 9999999999999 : now + session.expires_in * 1000,
+      session.max_downloads, uploaderIp,
+      req.user.isGuest ? null : req.user.id,
+      req.user.isGuest ? 'Guest' : req.user.username,
+      req.user.isGuest ? 1 : 0
+    );
+
     fs.rmSync(sessionDir, { recursive: true, force: true });
     db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
 
@@ -562,6 +613,9 @@ app.get('/api/download/:id', (req, res) => {
     return res.status(410).json({ error: 'Download limit reached' });
   }
 
+  // Keep transfer_log download count in sync
+  db.prepare('UPDATE transfer_log SET download_count = download_count + 1 WHERE file_id = ?').run(file.id);
+
   res.setHeader('Content-Disposition',
     `attachment; filename*=UTF-8''${encodeURIComponent(file.original_name)}`);
   res.setHeader('Content-Type', file.mime_type || 'application/octet-stream');
@@ -641,17 +695,14 @@ app.get('/api/admin/anon-log', requireAdmin, (_req, res) => {
   res.json(rows);
 });
 
-// All-transfers protocol (new)
+// All-transfers protocol — reads from persistent transfer_log (includes deleted/expired)
 app.get('/api/admin/transfers', requireAdmin, (_req, res) => {
   const rows = db.prepare(`
-    SELECT f.id, f.original_name, f.size, f.created_at, f.expires_at,
-           f.download_count, f.max_downloads, f.encrypted, f.uploader_ip,
-           f.user_id,
-           COALESCE(u.username, 'Guest') AS uploader,
-           CASE WHEN f.user_id IS NULL THEN 1 ELSE 0 END AS is_guest
-    FROM files f
-    LEFT JOIN users u ON u.id = f.user_id
-    ORDER BY f.created_at DESC
+    SELECT file_id AS id, original_name, size, created_at, expires_at,
+           download_count, max_downloads, encrypted, uploader_ip,
+           user_id, uploader, is_guest, status, deleted_at
+    FROM transfer_log
+    ORDER BY created_at DESC
     LIMIT 500
   `).all();
   res.json(rows);
@@ -664,6 +715,7 @@ app.delete('/api/admin/anon-log/:id', requireAdmin, (req, res) => {
   if (!file) return res.status(404).json({ error: 'Not found' });
   const fp = path.join(FILES_DIR, id);
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
+  db.prepare('UPDATE transfer_log SET status = ?, deleted_at = ? WHERE file_id = ?').run('deleted', Date.now(), id);
   db.prepare('DELETE FROM files WHERE id = ?').run(id);
   logEvent('file_deleted_admin', `Admin "${req.user.username}" deleted file: ${file.original_name}`, { fileId: id });
   res.json({ ok: true });
@@ -830,6 +882,7 @@ app.post('/api/admin/files/bulk-delete', requireAdmin, (req, res) => {
     if (!file) continue;
     const fp = path.join(FILES_DIR, id);
     if (fs.existsSync(fp)) fs.unlinkSync(fp);
+    db.prepare('UPDATE transfer_log SET status = ?, deleted_at = ? WHERE file_id = ?').run('deleted', Date.now(), id);
     db.prepare('DELETE FROM files WHERE id = ?').run(id);
     deletedNames.push(file.original_name);
     deleted++;
@@ -888,6 +941,7 @@ app.delete('/api/admin/files/:id', requireAdmin, (req, res) => {
   if (!file) return res.status(404).json({ error: 'File not found' });
   const fp = path.join(FILES_DIR, id);
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
+  db.prepare('UPDATE transfer_log SET status = ?, deleted_at = ? WHERE file_id = ?').run('deleted', Date.now(), id);
   db.prepare('DELETE FROM files WHERE id = ?').run(id);
   logEvent('file_deleted_admin', `Admin "${req.user.username}" deleted file: ${file.original_name}`, { fileId: id });
   res.json({ ok: true });
@@ -1059,6 +1113,7 @@ function cleanup() {
   for (const { id } of expiredFiles) {
     const fp = path.join(FILES_DIR, id);
     if (fs.existsSync(fp)) fs.unlinkSync(fp);
+    db.prepare('UPDATE transfer_log SET status = ?, deleted_at = ? WHERE file_id = ?').run('expired', now, id);
   }
   if (expiredFiles.length) {
     db.prepare('DELETE FROM files WHERE expires_at < ?').run(now);
