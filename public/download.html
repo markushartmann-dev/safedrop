@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeDrop</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script src="/theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #0f0f17;
+      --card:  rgba(20,20,33,.95);
+      --ibg:   rgba(255,255,255,.05);
+      --bdr:   rgba(255,255,255,.08);
+      --ac:    #6366f1;
+      --ac2:   #4f46e5;
+      --glow:  rgba(99,102,241,.2);
+      --ok:    #10b981;
+      --err:   #ef4444;
+      --tx:    #e2e8f0;
+      --mt:    #64748b;
+      --dm:    #94a3b8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--tx);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px 16px;
+    }
+    body::before {
+      content: '';
+      position: fixed; top: -250px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, var(--glow-ambient, rgba(99,102,241,.09)), transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .theme-switcher {
+      position: fixed; top: 14px; right: 16px; z-index: 200;
+      display: flex; align-items: center; gap: 2px;
+      background: var(--ibg); border: 1px solid var(--bdr);
+      border-radius: 999px; padding: 3px;
+    }
+    .theme-btn {
+      width: 26px; height: 26px; border-radius: 999px; border: none;
+      background: none; color: var(--dm); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .theme-btn:hover { color: var(--tx); }
+    .theme-btn.active { background: var(--ac); color: #fff; box-shadow: 0 0 8px var(--glow); }
+    .theme-btn svg { pointer-events: none; }
+
+    /* Logo */
+    .logo {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .82rem; font-weight: 600; color: var(--mt);
+      text-decoration: none; margin-bottom: 20px;
+      position: relative; z-index: 1;
+      transition: color .15s;
+    }
+    .logo:hover { color: var(--dm); }
+    .logo img { width: 20px; height: 20px; border-radius: 5px; }
+
+    /* Card */
+    .card {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 400px;
+      background: var(--card);
+      border: 1px solid var(--bdr);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,.55);
+      backdrop-filter: blur(20px);
+    }
+    .stripe { height: 3px; background: linear-gradient(90deg, var(--ac), #8b5cf6); }
+    .body { padding: 24px 22px 22px; }
+
+    /* Section label */
+    .lbl {
+      font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--mt); display: block; margin-bottom: 10px;
+    }
+
+    /* File row */
+    .file-row {
+      display: flex; align-items: center; gap: 11px;
+      background: var(--ibg); border: 1px solid var(--bdr);
+      border-radius: 9px; padding: 12px 13px; margin-bottom: 14px;
+    }
+    .ext {
+      width: 38px; height: 38px; flex-shrink: 0;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .58rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase;
+    }
+    .fname { font-size: .85rem; font-weight: 600; word-break: break-all; line-height: 1.3; }
+    .fmeta { font-size: .72rem; color: var(--mt); margin-top: 2px; }
+
+    /* Chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 18px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 3px 9px; border-radius: 999px;
+      background: var(--ibg); border: 1px solid var(--bdr);
+      font-size: .7rem; color: var(--dm); white-space: nowrap;
+    }
+    .chip.warn { color: #fbbf24; border-color: rgba(251,191,36,.2); background: rgba(251,191,36,.06); }
+    .chip.enc  { color: #818cf8; border-color: rgba(129,140,248,.2); background: rgba(129,140,248,.07); }
+
+    /* Password box */
+    .pw-box {
+      background: rgba(99,102,241,.06);
+      border: 1px solid rgba(99,102,241,.18);
+      border-radius: 9px; padding: 14px; margin-bottom: 14px;
+    }
+    .pw-box .lbl { color: #818cf8; margin-bottom: 8px; }
+
+    /* Input */
+    .input {
+      width: 100%; background: var(--ibg);
+      border: 1px solid var(--bdr); border-radius: 8px;
+      padding: 10px 12px; color: var(--tx); font-size: .875rem; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .input:focus { border-color: rgba(99,102,241,.45); box-shadow: 0 0 0 3px var(--glow); }
+    .input::placeholder { color: var(--mt); }
+
+    /* Error */
+    .error {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.2);
+      border-radius: 8px; padding: 9px 11px; margin-bottom: 12px;
+      font-size: .78rem; color: #fca5a5;
+      animation: shake .25s ease;
+    }
+    .error svg { width: 13px; height: 13px; flex-shrink: 0; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 30%{transform:translateX(-5px)} 70%{transform:translateX(5px)} }
+
+    /* Buttons */
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      color: #fff; font-size: .88rem; font-weight: 600; cursor: pointer;
+      background: linear-gradient(135deg, var(--ac), var(--ac2));
+      box-shadow: 0 3px 14px var(--glow); transition: all .18s;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 20px var(--glow); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .btn.ok { background: linear-gradient(135deg, var(--ok), #059669); box-shadow: 0 3px 14px rgba(16,185,129,.25); }
+
+    .btn-back {
+      display: block; width: 100%; margin-top: 8px; padding: 10px;
+      background: none; border: 1px solid var(--bdr); border-radius: 8px;
+      color: var(--mt); font-size: .78rem; cursor: pointer;
+      text-align: center; text-decoration: none; transition: all .15s;
+    }
+    .btn-back:hover { border-color: rgba(99,102,241,.3); color: var(--dm); }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; }
+
+    /* Error card */
+    .ec-icon  { font-size: 2rem; text-align: center; margin-bottom: 10px; }
+    .ec-title { font-size: .95rem; font-weight: 700; text-align: center; margin-bottom: 6px; }
+    .ec-sub   { font-size: .78rem; color: var(--mt); text-align: center; margin-bottom: 18px; line-height: 1.6; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="theme-switcher" id="theme-switcher"></div>
+
+  <a class="logo" href="/">
+    <img src="/favicon.svg" alt="">
+    SafeDrop
+  </a>
+
+  <!-- Image preview (shown for unencrypted images) -->
+  <div id="img-preview-wrap" class="img-preview-card hidden" style="position:relative;z-index:1;width:100%;max-width:400px">
+    <img id="img-preview" src="" alt="Vorschau">
+    <span class="img-preview-badge">Vorschau</span>
+  </div>
+
+  <!-- Loading -->
+  <div class="card" id="s-load">
+    <div class="stripe"></div>
+    <div class="body" style="text-align:center;padding:36px 22px">
+      <svg class="spin" style="width:22px;height:22px;color:#6366f1;margin-bottom:10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" stroke-opacity=".15"/>
+        <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
+      </svg>
+      <p style="font-size:.75rem;color:var(--mt)">Wird geladen …</p>
+    </div>
+  </div>
+
+  <!-- Password gate -->
+  <div class="card hidden" id="s-pw">
+    <div class="stripe"></div>
+    <div class="body">
+      <span class="lbl">Datei</span>
+      <div class="file-row">
+        <div class="ext" id="pw-ext"></div>
+        <div>
+          <div class="fname" id="pw-name"></div>
+          <div class="fmeta">Passwortgeschützt</div>
+        </div>
+      </div>
+
+      <div class="pw-box">
+        <span class="lbl">
+          🔒 Passwort erforderlich
+        </span>
+        <input class="input" type="password" id="pw-input"
+               placeholder="Passwort eingeben …" autocomplete="current-password">
+      </div>
+
+      <div class="error hidden" id="pw-err">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="pw-err-msg"></span>
+      </div>
+
+      <button class="btn" id="pw-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+        Weiter
+      </button>
+      <a class="btn-back" href="/">← SafeDrop Startseite</a>
+    </div>
+  </div>
+
+  <!-- Download -->
+  <div class="card hidden" id="s-dl">
+    <div class="stripe"></div>
+    <div class="body">
+      <span class="lbl">Datei herunterladen</span>
+      <div class="file-row">
+        <div class="ext" id="dl-ext"></div>
+        <div style="min-width:0;flex:1">
+          <div class="fname" id="dl-name"></div>
+          <div class="fmeta" id="dl-size"></div>
+        </div>
+      </div>
+      <div class="chips" id="dl-chips"></div>
+
+      <div class="error hidden" id="dl-err">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="dl-err-msg"></span>
+      </div>
+
+      <button class="btn" id="dl-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Herunterladen
+      </button>
+      <a class="btn-back" href="/">← Eigene Datei hochladen</a>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="card hidden" id="s-err">
+    <div class="stripe" style="background:var(--err)"></div>
+    <div class="body">
+      <div class="ec-icon" id="e-icon">⚠️</div>
+      <div class="ec-title" id="e-title">Fehler</div>
+      <div class="ec-sub"   id="e-msg"></div>
+      <a class="btn" href="/" style="text-decoration:none">← Zurück zur Startseite</a>
+    </div>
+  </div>
+
+<script>
+const fid = location.pathname.split('/').pop();
+let info = null, authPw = '';
+
+const $ = id => document.getElementById(id);
+const show = id => ['s-load','s-pw','s-dl','s-err'].forEach(x => $(x).classList.toggle('hidden', x !== id));
+
+// ── Ext badge colors ──────────────────────────────────────────────────────────
+function extStyle(n) {
+  const e = (n.split('.').pop()||'').toLowerCase();
+  if (['jpg','jpeg','png','gif','webp','svg','bmp'].includes(e)) return {bg:'rgba(244,114,182,.15)',c:'#f472b6'};
+  if (['mp4','mov','avi','mkv','webm'].includes(e))              return {bg:'rgba(248,113,113,.15)',c:'#f87171'};
+  if (['mp3','wav','flac','aac','ogg'].includes(e))              return {bg:'rgba(196,132,252,.15)',c:'#c084fc'};
+  if (['zip','rar','7z','tar','gz'].includes(e))                 return {bg:'rgba(251,191,36,.15)', c:'#fbbf24'};
+  if (['pdf'].includes(e))                                       return {bg:'rgba(248,113,113,.15)',c:'#f87171'};
+  if (['doc','docx'].includes(e))                                return {bg:'rgba(96,165,250,.15)', c:'#60a5fa'};
+  if (['xls','xlsx','csv'].includes(e))                          return {bg:'rgba(52,211,153,.15)', c:'#34d399'};
+  if (['js','ts','py','go','rs','sh','php','java'].includes(e))  return {bg:'rgba(129,140,248,.15)',c:'#818cf8'};
+  return {bg:'rgba(148,163,184,.1)',c:'#94a3b8'};
+}
+function badge(el, name) {
+  const s = extStyle(name), ext = (name.split('.').pop()||'file').toUpperCase().slice(0,4);
+  el.textContent = ext; el.style.background = s.bg; el.style.color = s.c;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const r = await fetch(`/api/info/${fid}`);
+    if (!r.ok) {
+      const d = await r.json().catch(()=>({}));
+      return err(r.status===410?'⏰':'🔍', r.status===410?'Link abgelaufen':'Nicht gefunden', d.error||'Dieser Link ist nicht mehr gültig.');
+    }
+    info = await r.json();
+    document.title = info.name + ' – SafeDrop';
+    if (info.passwordProtected) {
+      badge($('pw-ext'), info.name);
+      $('pw-name').textContent = info.name;
+      show('s-pw');
+      setTimeout(() => $('pw-input').focus(), 60);
+    } else {
+      maybeShowPreview();
+      renderDl(); show('s-dl');
+    }
+  } catch { err('⚠️','Verbindungsfehler','Server nicht erreichbar.'); }
+}
+
+// ── Password ──────────────────────────────────────────────────────────────────
+$('pw-input').addEventListener('keydown', e => { if (e.key==='Enter') $('pw-btn').click(); });
+$('pw-btn').addEventListener('click', async () => {
+  const pw = $('pw-input').value.trim();
+  if (!pw) { return pwErr('Bitte Passwort eingeben.'); }
+  $('pw-err').classList.add('hidden');
+  busy($('pw-btn'), true);
+  try {
+    const r = await fetch(`/api/verify/${fid}`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pw})
+    });
+    if (!r.ok) { const d=await r.json().catch(()=>({})); pwErr(d.error||'Falsches Passwort.'); busy($('pw-btn'),false); $('pw-input').select(); return; }
+    authPw = pw; renderDl(); show('s-dl');
+  } catch { pwErr('Verbindungsfehler.'); busy($('pw-btn'),false); }
+});
+
+// ── Image preview ─────────────────────────────────────────────────────────────
+function maybeShowPreview() {
+  if (!info || info.passwordProtected) return;
+  const mime = info.mimeType || '';
+  if (!mime.startsWith('image/')) return;
+  const wrap = $('img-preview-wrap');
+  const img  = $('img-preview');
+  img.src = `/api/preview/${fid}`;
+  img.alt = info.name;
+  wrap.classList.remove('hidden');
+}
+
+// ── Download view ─────────────────────────────────────────────────────────────
+function renderDl() {
+  badge($('dl-ext'), info.name);
+  $('dl-name').textContent = info.name;
+  $('dl-size').textContent = fmtB(info.size);
+
+  const limitReached = info.maxDownloads > 0 && info.downloads >= info.maxDownloads;
+  const diff = info.expiresAt - Date.now();
+  const warn = diff < 3600000*6;
+  const dlTxt = info.maxDownloads > 0 ? `${info.downloads} / ${info.maxDownloads} Downloads` : `${info.downloads} Downloads`;
+
+  $('dl-chips').innerHTML =
+    `<span class="chip ${warn?'warn':''}">${warn?'⚠ ':''}${fmtExp(info.expiresAt)}</span>` +
+    `<span class="chip ${limitReached?'warn':''}">${dlTxt}</span>` +
+    (info.passwordProtected ? '<span class="chip enc">🔒 Verschlüsselt</span>' : '');
+
+  // Block button immediately if limit already reached
+  const btn = $('dl-btn');
+  if (limitReached) {
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
+    btn.style.cursor = 'not-allowed';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Download-Limit erreicht';
+    $('dl-err').classList.remove('hidden');
+    $('dl-err-msg').textContent = 'Die maximale Anzahl an Downloads wurde erreicht.';
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+    btn.innerHTML = dlBtnHTML();
+  }
+}
+
+// ── Download ──────────────────────────────────────────────────────────────────
+$('dl-btn').addEventListener('click', async () => {
+  if ($('dl-btn').disabled) return;
+
+  // Re-check server-side before starting (fresh fetch, never from cache)
+  $('dl-err').classList.add('hidden');
+  try {
+    const check = await fetch(`/api/info/${fid}`, {cache: 'no-store'});
+    const fresh = await check.json();
+    if (!check.ok || (fresh.maxDownloads > 0 && fresh.downloads >= fresh.maxDownloads)) {
+      info = fresh;
+      renderDl();
+      return;
+    }
+    info = fresh;
+  } catch { /* proceed anyway, server will block if needed */ }
+
+  const url = `/api/download/${fid}${authPw?'?password='+encodeURIComponent(authPw):''}`;
+  const a = document.createElement('a'); a.href = url; a.download = info.name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+  // Update counter and re-render after short delay
+  setTimeout(async () => {
+    try {
+      const r = await fetch(`/api/info/${fid}`, {cache: 'no-store'});
+      if (r.ok) { info = await r.json(); renderDl(); }
+    } catch {}
+  }, 1500);
+
+  $('dl-btn').classList.add('ok');
+  $('dl-btn').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg> Download gestartet';
+  setTimeout(() => { $('dl-btn').classList.remove('ok'); renderDl(); }, 3000);
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function dlBtnHTML() {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Herunterladen';
+}
+
+function pwErr(m) {
+  $('pw-err-msg').textContent = m;
+  $('pw-err').classList.remove('hidden');
+  $('pw-err').style.animation='none'; $('pw-err').offsetHeight; $('pw-err').style.animation='';
+}
+function err(icon,title,msg) { $('e-icon').textContent=icon; $('e-title').textContent=title; $('e-msg').textContent=msg; show('s-err'); }
+function busy(btn, on) {
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Wird geprüft …'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="9 18 15 12 9 6"/></svg> Weiter';
+}
+function fmtB(b) {
+  if (!b) return '0 B';
+  const u=['B','KB','MB','GB','TB'], i=Math.floor(Math.log(b)/Math.log(1024));
+  return (b/1024**i).toFixed(i?1:0)+' '+u[i];
+}
+function fmtExp(ts) {
+  if (ts > Date.now() + 50 * 365 * 24 * 3600 * 1000) return 'Unbegrenzt';
+  const d=ts-Date.now(); if(d<=0) return 'Abgelaufen';
+  const days=Math.floor(d/86400000), hrs=Math.floor((d%86400000)/3600000), mins=Math.floor((d%3600000)/60000);
+  if(days>0) return `${days} Tag${days>1?'e':''} verbleibend`;
+  if(hrs>0)  return `${hrs} Std. verbleibend`;
+  return `${mins} Min. verbleibend`;
+}
+
+init();
+window.fsTheme.renderSwitcher('theme-switcher');
+</script>
+</body>
+</html>

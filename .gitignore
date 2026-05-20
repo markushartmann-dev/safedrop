@@ -1,0 +1,21 @@
+# Abhängigkeiten
+node_modules/
+
+# Laufzeit-Daten (Datenbank + hochgeladene Dateien)
+data/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
