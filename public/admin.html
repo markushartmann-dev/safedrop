@@ -941,17 +941,45 @@
     </div>
   </div>
 
-  <!-- PW Reset modal -->
+  <!-- PW Set modal -->
   <div class="modal-overlay hidden" id="modal-pwreset">
     <div class="modal">
       <div class="modal-stripe"></div>
       <div class="modal-body">
-        <div class="modal-title">Reset password</div>
-        <div class="modal-sub">A new STIG password is generated. All active sessions for this user will be terminated.</div>
+        <div class="modal-title">Set password</div>
+        <div class="modal-sub">Set a new password for <strong id="pwreset-username"></strong>. All active sessions for this user will be terminated.</div>
 
+        <!-- Input section -->
+        <div id="pwreset-input-section">
+          <div class="modal-field">
+            <label>New password</label>
+            <div style="display:flex;margin-top:6px;gap:0">
+              <input class="modal-input input-mono" type="password" id="pwreset-input"
+                     placeholder="Min. 8 characters" autocomplete="new-password"
+                     style="flex:1;border-radius:9px 0 0 9px;border-right:none">
+              <button type="button" id="btn-pwreset-toggle" title="Show / hide"
+                      style="padding:0 11px;background:var(--input-bg,rgba(255,255,255,.05));border:1px solid var(--border,rgba(255,255,255,.1));border-right:none;cursor:pointer;color:var(--muted);transition:color .15s"
+                      onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <button type="button" id="btn-pwreset-generate" class="btn-gen-pw"
+                      style="border-radius:0 9px 9px 0;white-space:nowrap;font-size:.75rem">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Generate STIG
+              </button>
+            </div>
+          </div>
+          <div id="pwreset-err" class="hidden" style="margin-top:8px;padding:8px 11px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:7px;font-size:.78rem;color:#fca5a5"></div>
+          <div class="modal-notice" style="margin-top:10px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            All active sessions for this user will be immediately terminated.
+          </div>
+        </div>
+
+        <!-- Result section -->
         <div id="pwreset-result-section" class="hidden">
           <div class="modal-field" style="margin-bottom:0">
-            <label>New password (shown once)</label>
+            <label>Password set ✓</label>
             <div class="pw-result">
               <input type="text" id="reset-pw-display" readonly>
               <button class="pw-copy-btn" id="btn-copy-reset-pw">Copy</button>
@@ -963,21 +991,29 @@
               <line x1="12" y1="9" x2="12" y2="13"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            This password will not be shown again.
+            Save this password now — it will not be shown again.
           </div>
         </div>
 
-        <div id="pwreset-loading-section">
+        <!-- Loading section -->
+        <div id="pwreset-loading-section" class="hidden">
           <div style="text-align:center;padding:16px 0;color:var(--mt);font-size:.82rem">
             <svg class="spin" style="width:20px;height:20px;color:var(--ac);margin-bottom:8px;display:block;margin:0 auto 8px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10" stroke-opacity=".2"/>
               <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
             </svg>
-            Resetting …
+            Setting password …
           </div>
         </div>
 
-        <div class="modal-footer" id="pwreset-footer" style="display:none">
+        <div class="modal-footer" id="pwreset-footer">
+          <button class="btn-modal-cancel" id="btn-pwreset-cancel">Cancel</button>
+          <button class="btn-primary" id="btn-pwreset-submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Set password
+          </button>
+        </div>
+        <div class="modal-footer" id="pwreset-done-footer" style="display:none">
           <button class="btn-primary" id="btn-pwreset-done">Done</button>
         </div>
       </div>
@@ -1164,36 +1200,83 @@ $('btn-create-done').addEventListener('click', () => {
   $('btn-create-submit').textContent = 'Create';
 });
 
-// ── PW Reset modal ────────────────────────────────────────────────────────────
-async function resetPassword(id, username) {
-  if (!confirm(`Reset password for "${username}"?`)) return;
-  $('reset-pw-display').value = '';
+// ── PW Set modal ──────────────────────────────────────────────────────────────
+let _pwresetUserId = null;
+
+function resetPassword(id, username) {
+  _pwresetUserId = id;
+  $('pwreset-username').textContent = username;
+  $('pwreset-input').value = '';
+  $('pwreset-input').type = 'password';
+  $('pwreset-err').classList.add('hidden');
+  $('pwreset-input-section').classList.remove('hidden');
   $('pwreset-result-section').classList.add('hidden');
-  $('pwreset-loading-section').classList.remove('hidden');
-  $('pwreset-footer').style.display = 'none';
+  $('pwreset-loading-section').classList.add('hidden');
+  $('pwreset-footer').style.display = '';
+  $('pwreset-done-footer').style.display = 'none';
   $('modal-pwreset').classList.remove('hidden');
+  setTimeout(() => $('pwreset-input').focus(), 60);
+}
+
+$('btn-pwreset-toggle').addEventListener('click', () => {
+  const inp = $('pwreset-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+
+$('btn-pwreset-generate').addEventListener('click', async () => {
+  const btn = $('btn-pwreset-generate');
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/password/generate');
+    const d = await r.json();
+    $('pwreset-input').value = d.password;
+    $('pwreset-input').type = 'text';
+  } catch { toast('Could not generate password', 'err'); }
+  btn.disabled = false;
+});
+
+$('btn-pwreset-submit').addEventListener('click', async () => {
+  const pw = $('pwreset-input').value.trim();
+  if (pw.length < 8) {
+    $('pwreset-err').textContent = 'Password must be at least 8 characters.';
+    $('pwreset-err').classList.remove('hidden');
+    return;
+  }
+  $('pwreset-err').classList.add('hidden');
+  $('pwreset-input-section').classList.add('hidden');
+  $('pwreset-footer').style.display = 'none';
+  $('pwreset-loading-section').classList.remove('hidden');
 
   try {
-    const r = await fetch(`/api/admin/users/${id}`, {
+    const r = await fetch(`/api/admin/users/${_pwresetUserId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'resetPassword' })
+      body: JSON.stringify({ action: 'setPassword', password: pw })
     });
     const d = await r.json();
     $('pwreset-loading-section').classList.add('hidden');
     if (!r.ok) {
-      $('modal-pwreset').classList.add('hidden');
-      toast(d.error || 'Error', 'err');
+      $('pwreset-input-section').classList.remove('hidden');
+      $('pwreset-footer').style.display = '';
+      $('pwreset-err').textContent = d.error || 'Error setting password.';
+      $('pwreset-err').classList.remove('hidden');
       return;
     }
-    $('reset-pw-display').value = d.password;
+    $('reset-pw-display').value = pw;
     $('pwreset-result-section').classList.remove('hidden');
-    $('pwreset-footer').style.display = 'flex';
+    $('pwreset-done-footer').style.display = '';
   } catch {
-    $('modal-pwreset').classList.add('hidden');
-    toast('Connection error', 'err');
+    $('pwreset-loading-section').classList.add('hidden');
+    $('pwreset-input-section').classList.remove('hidden');
+    $('pwreset-footer').style.display = '';
+    $('pwreset-err').textContent = 'Connection error.';
+    $('pwreset-err').classList.remove('hidden');
   }
-}
+});
+
+$('pwreset-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('btn-pwreset-submit').click();
+});
 
 $('btn-copy-reset-pw').addEventListener('click', () => {
   navigator.clipboard.writeText($('reset-pw-display').value);
@@ -1201,12 +1284,21 @@ $('btn-copy-reset-pw').addEventListener('click', () => {
   setTimeout(() => { $('btn-copy-reset-pw').textContent = 'Copy'; }, 2000);
 });
 
+$('btn-pwreset-cancel').addEventListener('click', () => {
+  $('modal-pwreset').classList.add('hidden');
+  _pwresetUserId = null;
+});
+
 $('btn-pwreset-done').addEventListener('click', () => {
   $('modal-pwreset').classList.add('hidden');
+  _pwresetUserId = null;
 });
 
 $('modal-pwreset').addEventListener('click', e => {
-  if (e.target === $('modal-pwreset')) $('modal-pwreset').classList.add('hidden');
+  if (e.target === $('modal-pwreset')) {
+    $('modal-pwreset').classList.add('hidden');
+    _pwresetUserId = null;
+  }
 });
 
 // ── Files ─────────────────────────────────────────────────────────────────────

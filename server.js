@@ -841,6 +841,17 @@ app.patch('/api/admin/users/:id', requireAdmin, (req, res) => {
     return res.json({ ok: true, password: pw });
   }
 
+  if (action === 'setPassword') {
+    const { password } = req.body;
+    if (!password || password.trim().length < 8)
+      return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+    const salt = crypto.randomBytes(32).toString('hex');
+    const hash = crypto.pbkdf2Sync(password.trim(), salt, 100000, 32, 'sha256').toString('hex');
+    db.prepare('UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?').run(hash, salt, id);
+    db.prepare('DELETE FROM auth_sessions WHERE user_id = ?').run(id);
+    return res.json({ ok: true });
+  }
+
   res.status(400).json({ error: 'Unknown action' });
 });
 
