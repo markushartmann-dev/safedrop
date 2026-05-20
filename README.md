@@ -22,6 +22,7 @@
 - **Configurable TTL**: 1 hour · 2 h · 4 h · 6 h · 1 day · 3 days · 7 days · 30 days · No expiry
 - **Max downloads** – optional: file is automatically locked after N downloads
 - **Cleanup job** – runs hourly, automatically deletes expired files, sessions and secrets
+- **Persistent transfer log** – every upload is permanently recorded; deleted and expired files remain visible in the admin transfer log with their final download count and status
 
 ### User Roles
 | Role | Description |
@@ -45,12 +46,19 @@
 | Tab | Content |
 |-----|---------|
 | Dashboard | Overall statistics (users, files, downloads, storage) |
-| Users | Create, lock/unlock, reset password, delete |
+| Users | Create, lock/unlock, set password (custom or STIG-generated), delete |
 | Files | All active files, single and bulk delete, admin download |
-| Transfers | Full upload log including guest uploads and IP addresses |
+| Transfers | Persistent upload log – includes deleted and expired files, guest uploads, IP addresses, and status badges (Active / Deleted / Expired) |
 | Storage | Storage usage broken down by user |
 | Settings | Bandwidth throttling (upload/download) in KB/s |
 | System Log | Event log of the last 1,000 entries |
+
+#### Password management for users
+Admins can set any password for a user account via the **Users** tab → **PW reset**:
+- Enter a **custom password** (min. 8 characters)
+- Or click **Generate STIG** to auto-fill a cryptographically secure STIG password
+- The password is shown once after saving with a copy button
+- All active sessions of the affected user are immediately terminated
 
 ### Bandwidth Throttling
 - Separate token-bucket throttling for **upload** and **download**
