@@ -652,26 +652,54 @@ app.get('/api/download/:id', (req, res) => {
   }
 });
 
-// 5b. Bulk ZIP download – own unencrypted files (user)
+// Helper: append a file entry (plain or decrypted) to an archiver instance
+function appendToZip(archive, file, fp, password) {
+  if (file.encrypted && password) {
+    const key = crypto.pbkdf2Sync(
+      password, Buffer.from(file.password_salt, 'hex'), 100000, 32, 'sha256'
+    );
+    const decipher = crypto.createDecipheriv(
+      'aes-256-gcm', key, Buffer.from(file.iv, 'hex')
+    );
+    decipher.setAuthTag(Buffer.from(file.auth_tag, 'hex'));
+    const fileStream = fs.createReadStream(fp);
+    decipher.on('error', err => {
+      console.error('ZIP decrypt error for', file.original_name, err.message);
+    });
+    archive.append(fileStream.pipe(decipher), { name: file.original_name });
+  } else {
+    archive.file(fp, { name: file.original_name });
+  }
+}
+
+// 5b. Bulk ZIP download – own files (user); optional password for encrypted files
 app.post('/api/my/download-zip', requireAuth, (req, res) => {
-  const { ids } = req.body;
+  const { ids, password } = req.body;
   if (!Array.isArray(ids) || ids.length === 0)
     return res.status(400).json({ error: 'No file IDs provided' });
 
-  const files = [], skipped = [];
+  const toAdd = [], skipped = [];
   for (const id of ids) {
     if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/.test(id)) continue;
     const file = db.prepare('SELECT * FROM files WHERE id = ? AND user_id = ?')
       .get(id, req.user.id);
     if (!file) continue;
-    if (file.encrypted) { skipped.push(file.original_name); continue; }
     const fp = path.join(FILES_DIR, id);
     if (!fs.existsSync(fp)) continue;
-    files.push({ file, fp });
+
+    if (file.encrypted) {
+      if (!password) { skipped.push(file.original_name); continue; }
+      const hash = crypto.createHash('sha256')
+        .update(password + file.password_salt).digest('hex');
+      if (hash !== file.password_hash) { skipped.push(file.original_name); continue; }
+      toAdd.push({ file, fp, decrypt: true });
+    } else {
+      toAdd.push({ file, fp, decrypt: false });
+    }
   }
 
-  if (!files.length)
-    return res.status(400).json({ error: 'No downloadable files (encrypted or not found)' });
+  if (!toAdd.length)
+    return res.status(400).json({ error: 'No downloadable files (wrong / missing password or not found)' });
 
   const date = new Date().toISOString().slice(0, 10);
   res.setHeader('Content-Type', 'application/zip');
@@ -681,29 +709,38 @@ app.post('/api/my/download-zip', requireAuth, (req, res) => {
   const archive = archiver('zip', { zlib: { level: 6 } });
   archive.on('error', err => { console.error('ZIP error:', err); try { res.destroy(); } catch (_) {} });
   archive.pipe(res);
-  for (const { file, fp } of files) archive.file(fp, { name: file.original_name });
+  for (const { file, fp, decrypt } of toAdd)
+    appendToZip(archive, file, fp, decrypt ? password : null);
   archive.finalize();
 });
 
-// 5c. Bulk ZIP download – any unencrypted files (admin)
+// 5c. Bulk ZIP download – any files (admin); optional password for encrypted files
 app.post('/api/admin/download-zip', requireAdmin, (req, res) => {
-  const { ids } = req.body;
+  const { ids, password } = req.body;
   if (!Array.isArray(ids) || ids.length === 0)
     return res.status(400).json({ error: 'No file IDs provided' });
 
-  const files = [], skipped = [];
+  const toAdd = [], skipped = [];
   for (const id of ids) {
     if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/.test(id)) continue;
     const file = db.prepare('SELECT * FROM files WHERE id = ?').get(id);
     if (!file) continue;
-    if (file.encrypted) { skipped.push(file.original_name); continue; }
     const fp = path.join(FILES_DIR, id);
     if (!fs.existsSync(fp)) continue;
-    files.push({ file, fp });
+
+    if (file.encrypted) {
+      if (!password) { skipped.push(file.original_name); continue; }
+      const hash = crypto.createHash('sha256')
+        .update(password + file.password_salt).digest('hex');
+      if (hash !== file.password_hash) { skipped.push(file.original_name); continue; }
+      toAdd.push({ file, fp, decrypt: true });
+    } else {
+      toAdd.push({ file, fp, decrypt: false });
+    }
   }
 
-  if (!files.length)
-    return res.status(400).json({ error: 'No downloadable files (all encrypted or not found)' });
+  if (!toAdd.length)
+    return res.status(400).json({ error: 'No downloadable files (wrong / missing password or not found)' });
 
   const date = new Date().toISOString().slice(0, 10);
   res.setHeader('Content-Type', 'application/zip');
@@ -713,7 +750,8 @@ app.post('/api/admin/download-zip', requireAdmin, (req, res) => {
   const archive = archiver('zip', { zlib: { level: 6 } });
   archive.on('error', err => { console.error('ZIP error:', err); try { res.destroy(); } catch (_) {} });
   archive.pipe(res);
-  for (const { file, fp } of files) archive.file(fp, { name: file.original_name });
+  for (const { file, fp, decrypt } of toAdd)
+    appendToZip(archive, file, fp, decrypt ? password : null);
   archive.finalize();
 });
 

@@ -609,10 +609,75 @@ input[type=number].input::-webkit-outer-spin-button { -webkit-appearance: none; 
 .btn-copy-result:hover  { background: var(--accent-dk); }
 .btn-copy-result.copied { background: var(--success); }
 
-@media (max-width: 480px) {
-  .card { padding: 22px 18px; }
-  header { padding: 16px 18px; }
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  /* date chip hidden on small phones */
+  .date-chip { display: none; }
+
+  /* header user row: wrap tightly */
+  .header-user {
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .header-username { font-size: .78rem; }
+  .header-admin-link, .btn-header-logout { font-size: .73rem; padding: 4px 9px; }
+
+  main { padding: 0 14px 48px; }
+
+  .card { padding: 18px 16px; }
+
+  /* Drop zone */
+  .drop-zone { padding: 24px 14px; }
+  h2 { font-size: 1.05rem; }
+
+  /* Pills wrap to 3 per row comfortably */
+  .pills { gap: 5px; }
+  .pill { font-size: .72rem; padding: 5px 10px; }
+
+  /* Options */
+  .options { gap: 18px; }
+  .opt-label { font-size: .75rem; }
+  .pw-gen-row { flex-wrap: wrap; gap: 7px; }
+  #pw-display { min-width: 0; flex: 1; }
+
+  /* My Files */
+  #my-files-section { margin-top: 20px; }
+
+  /* Selection bar: stack on very small screens */
+  #my-sel-bar { flex-wrap: wrap; gap: 6px; }
+  #my-sel-count { width: 100%; }
+  .btn-my-deselect, .btn-my-zip { flex: 1; justify-content: center; }
+
+  /* File list items */
+  .my-file-item {
+    padding: 10px 12px;
+    gap: 9px;
+  }
+  .my-file-name { font-size: .82rem; }
+  .my-file-meta { font-size: .7rem; gap: 7px; }
+  .btn-copy-link { font-size: .72rem; padding: 5px 9px; }
+
+  /* Thumb size */
+  .my-file-thumb,
+  .my-file-icon { width: 34px; height: 34px; border-radius: 7px; }
+
+  /* Success / result */
+  .share-box { flex-direction: column; }
+  .btn-copy-result { width: 100%; justify-content: center; }
+  .result-link-row { flex-direction: column; }
+  .result-url-input { font-size: .73rem; }
+
+  /* Gallery */
   .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 7px; }
   .lightbox-prev { left: 4px; }
   .lightbox-next { right: 4px; }
+
+  /* ZIP password modal */
+  .zip-modal { padding: 20px 16px; }
 }

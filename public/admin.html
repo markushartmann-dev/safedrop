@@ -511,9 +511,56 @@
     .empty-row td { color: var(--mt); font-size: .8rem; text-align: center; padding: 28px; }
 
     @media (max-width: 640px) {
-      .topbar { padding: 0 16px; }
-      .content { padding: 20px 14px 40px; }
-      th, td { padding: 9px 10px; }
+      body { zoom: 1; }
+
+      /* Topbar */
+      .topbar { padding: 0 14px; height: 52px; }
+      .topbar-left { gap: 8px; }
+      .logo { font-size: .82rem; }
+      .badge-admin { font-size: .62rem; padding: 2px 6px; }
+      .topbar-right { gap: 6px; }
+      #date-chip { display: none; }
+      .btn-logout { padding: 6px 10px; font-size: .78rem; }
+      .btn-logout svg { display: none; }
+
+      /* Content */
+      .content { padding: 16px 12px 40px; }
+
+      /* Tabs: scroll horizontally */
+      .tabs {
+        overflow-x: auto; -webkit-overflow-scrolling: touch;
+        gap: 3px; padding-bottom: 4px;
+        scrollbar-width: none;
+      }
+      .tabs::-webkit-scrollbar { display: none; }
+      .tab { padding: 7px 13px; font-size: .78rem; white-space: nowrap; }
+
+      /* Stats grid: 2 columns on phone */
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card { padding: 14px 14px; }
+      .stat-value { font-size: 1.4rem; }
+
+      /* Section header */
+      .section-header { flex-wrap: wrap; gap: 8px; }
+
+      /* Bulk bar: stack on small screens */
+      .bulk-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+      .bulk-bar-right { flex-wrap: wrap; gap: 6px; }
+      .btn-bulk-del, .btn-bulk-zip, .btn-bulk-cancel { flex: 1; justify-content: center; }
+
+      /* Tables: horizontal scroll */
+      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      th, td { padding: 8px 10px; font-size: .78rem; }
+
+      /* Modal */
+      .modal { margin: 12px; width: calc(100% - 24px); }
+
+      /* Settings */
+      .settings-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 400px) {
+      .stats-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -955,6 +1002,29 @@
     </div>
   </div>
 
+  <!-- ZIP password modal -->
+  <div class="modal-overlay hidden" id="modal-zip-pw">
+    <div class="modal">
+      <div class="modal-stripe"></div>
+      <div class="modal-body">
+        <div class="modal-title">Encrypted files selected</div>
+        <div class="modal-sub">Enter the shared password to decrypt encrypted files on the fly. Files where the password doesn't match will be skipped. Leave blank to include only unencrypted files.</div>
+        <div class="modal-field">
+          <label for="zip-pw-input">Password (optional)</label>
+          <input class="modal-input" type="password" id="zip-pw-input"
+                 placeholder="••••••••••••" autocomplete="off">
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" id="btn-zip-pw-cancel">Cancel</button>
+          <button class="btn-primary" id="btn-zip-pw-ok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Download ZIP
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- PW Set modal -->
   <div class="modal-overlay hidden" id="modal-pwreset">
     <div class="modal">
@@ -1387,7 +1457,7 @@ function renderFilesTable() {
     const expired = f.expires_at < now;
     return `
       <tr data-fid="${esc(f.id)}">
-        <td class="cb-cell"><input type="checkbox" class="file-cb" data-id="${esc(f.id)}"></td>
+        <td class="cb-cell"><input type="checkbox" class="file-cb" data-id="${esc(f.id)}" data-encrypted="${f.encrypted ? '1' : '0'}"></td>
         <td>
           <div style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(f.original_name)}">${esc(f.original_name)}</div>
           ${f.encrypted ? '<span class="badge badge-enc">Encrypted</span>' : ''}
@@ -1450,9 +1520,46 @@ $('cb-all-files').addEventListener('change', function() {
 
 $('btn-bulk-cancel').addEventListener('click', clearSelection);
 
+// ── ZIP password modal helper (admin) ────────────────────────────────────────
+function askZipPasswordAdmin() {
+  $('zip-pw-input').value = '';
+  $('modal-zip-pw').classList.remove('hidden');
+  setTimeout(() => $('zip-pw-input').focus(), 60);
+  return new Promise(resolve => {
+    let done = false;
+    const finish = val => {
+      if (done) return; done = true;
+      document.removeEventListener('keydown', onKey);
+      $('modal-zip-pw').classList.add('hidden');
+      resolve(val);
+    };
+    const onKey = e => {
+      if (e.key === 'Enter') finish($('zip-pw-input').value);
+      if (e.key === 'Escape') finish(null);
+    };
+    document.addEventListener('keydown', onKey);
+    $('btn-zip-pw-ok').onclick     = () => finish($('zip-pw-input').value);
+    $('btn-zip-pw-cancel').onclick = () => finish(null);
+  });
+}
+
 $('btn-bulk-zip').addEventListener('click', async () => {
   const ids = getSelectedIds();
   if (!ids.length) return;
+
+  // Check if any selected file is encrypted
+  const hasEncrypted = ids.some(id => {
+    const cb = document.querySelector(`.file-cb[data-id="${id}"]`);
+    return cb && cb.dataset.encrypted === '1';
+  });
+
+  let password = undefined;
+  if (hasEncrypted) {
+    const pw = await askZipPasswordAdmin();
+    if (pw === null) return; // cancelled
+    password = pw || undefined;
+  }
+
   const btn = $('btn-bulk-zip');
   const origHTML = btn.innerHTML;
   btn.disabled = true;
@@ -1461,7 +1568,7 @@ $('btn-bulk-zip').addEventListener('click', async () => {
     const r = await fetch('/api/admin/download-zip', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids })
+      body: JSON.stringify({ ids, password })
     });
     if (!r.ok) { const d = await r.json().catch(() => ({})); toast(d.error || 'Download failed', 'err'); return; }
     const skipped = parseInt(r.headers.get('X-Skipped-Files') || '0');
@@ -1473,7 +1580,7 @@ $('btn-bulk-zip').addEventListener('click', async () => {
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
-    toast(`ZIP download started${skipped ? ' · ' + skipped + ' encrypted file(s) skipped' : ''}`, 'ok');
+    toast(`ZIP download started${skipped ? ' · ' + skipped + ' file(s) skipped (wrong/missing password)' : ''}`, 'ok');
   } catch (e) { toast('Download failed: ' + e.message, 'err'); }
   finally { btn.disabled = false; btn.innerHTML = origHTML; }
 });
