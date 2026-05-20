@@ -369,6 +369,16 @@
     }
     .btn-bulk-del:hover { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.45); }
     .btn-bulk-del svg { width: 13px; height: 13px; }
+    .btn-bulk-zip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 7px;
+      background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.3);
+      color: #a5b4fc; font-size: .78rem; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+    }
+    .btn-bulk-zip:hover { background: rgba(99,102,241,.22); border-color: rgba(99,102,241,.5); }
+    .btn-bulk-zip:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-bulk-zip svg { width: 13px; height: 13px; }
     .btn-bulk-cancel {
       padding: 7px 14px; border-radius: 7px;
       background: none; border: 1px solid var(--bdr);
@@ -673,6 +683,10 @@
         <span class="bulk-bar-left"><span id="bulk-count">0</span> file(s) selected</span>
         <div class="bulk-bar-right">
           <button class="btn-bulk-cancel" id="btn-bulk-cancel">Deselect all</button>
+          <button class="btn-bulk-zip" id="btn-bulk-zip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download as ZIP
+          </button>
           <button class="btn-bulk-del" id="btn-bulk-delete">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
             Delete selected
@@ -1435,6 +1449,34 @@ $('cb-all-files').addEventListener('change', function() {
 });
 
 $('btn-bulk-cancel').addEventListener('click', clearSelection);
+
+$('btn-bulk-zip').addEventListener('click', async () => {
+  const ids = getSelectedIds();
+  if (!ids.length) return;
+  const btn = $('btn-bulk-zip');
+  const origHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Creating …';
+  try {
+    const r = await fetch('/api/admin/download-zip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids })
+    });
+    if (!r.ok) { const d = await r.json().catch(() => ({})); toast(d.error || 'Download failed', 'err'); return; }
+    const skipped = parseInt(r.headers.get('X-Skipped-Files') || '0');
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `safedrop-admin-${new Date().toISOString().slice(0,10)}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    toast(`ZIP download started${skipped ? ' · ' + skipped + ' encrypted file(s) skipped' : ''}`, 'ok');
+  } catch (e) { toast('Download failed: ' + e.message, 'err'); }
+  finally { btn.disabled = false; btn.innerHTML = origHTML; }
+});
 
 $('btn-bulk-delete').addEventListener('click', async () => {
   const ids = getSelectedIds();

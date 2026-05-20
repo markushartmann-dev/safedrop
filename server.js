@@ -9,6 +9,7 @@ const Database = require('better-sqlite3');
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
+const archiver = require('archiver');
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000');
@@ -651,7 +652,72 @@ app.get('/api/download/:id', (req, res) => {
   }
 });
 
-// 5b. Image preview (public, no download-count increment)
+// 5b. Bulk ZIP download – own unencrypted files (user)
+app.post('/api/my/download-zip', requireAuth, (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0)
+    return res.status(400).json({ error: 'No file IDs provided' });
+
+  const files = [], skipped = [];
+  for (const id of ids) {
+    if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/.test(id)) continue;
+    const file = db.prepare('SELECT * FROM files WHERE id = ? AND user_id = ?')
+      .get(id, req.user.id);
+    if (!file) continue;
+    if (file.encrypted) { skipped.push(file.original_name); continue; }
+    const fp = path.join(FILES_DIR, id);
+    if (!fs.existsSync(fp)) continue;
+    files.push({ file, fp });
+  }
+
+  if (!files.length)
+    return res.status(400).json({ error: 'No downloadable files (encrypted or not found)' });
+
+  const date = new Date().toISOString().slice(0, 10);
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', `attachment; filename="safedrop-${date}.zip"`);
+  res.setHeader('X-Skipped-Files', skipped.length.toString());
+
+  const archive = archiver('zip', { zlib: { level: 6 } });
+  archive.on('error', err => { console.error('ZIP error:', err); try { res.destroy(); } catch (_) {} });
+  archive.pipe(res);
+  for (const { file, fp } of files) archive.file(fp, { name: file.original_name });
+  archive.finalize();
+});
+
+// 5c. Bulk ZIP download – any unencrypted files (admin)
+app.post('/api/admin/download-zip', requireAdmin, (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0)
+    return res.status(400).json({ error: 'No file IDs provided' });
+
+  const files = [], skipped = [];
+  for (const id of ids) {
+    if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/.test(id)) continue;
+    const file = db.prepare('SELECT * FROM files WHERE id = ?').get(id);
+    if (!file) continue;
+    if (file.encrypted) { skipped.push(file.original_name); continue; }
+    const fp = path.join(FILES_DIR, id);
+    if (!fs.existsSync(fp)) continue;
+    files.push({ file, fp });
+  }
+
+  if (!files.length)
+    return res.status(400).json({ error: 'No downloadable files (all encrypted or not found)' });
+
+  const date = new Date().toISOString().slice(0, 10);
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', `attachment; filename="safedrop-admin-${date}.zip"`);
+  res.setHeader('X-Skipped-Files', skipped.length.toString());
+
+  const archive = archiver('zip', { zlib: { level: 6 } });
+  archive.on('error', err => { console.error('ZIP error:', err); try { res.destroy(); } catch (_) {} });
+  archive.pipe(res);
+  for (const { file, fp } of files) archive.file(fp, { name: file.original_name });
+  archive.finalize();
+});
+
+// 5d. Image preview (public, no download-count increment)
 app.get('/api/preview/:id', (req, res) => {
   noCache(res);
   const file = db.prepare('SELECT * FROM files WHERE id = ?').get(req.params.id);

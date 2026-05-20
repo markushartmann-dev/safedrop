@@ -8,6 +8,43 @@
   <script src="/theme.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ── My Files selection bar ── */
+    #my-sel-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.2);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: .78rem;
+    }
+    #my-sel-bar.hidden { display: none; }
+    #my-sel-count { flex: 1; color: var(--dim); font-weight: 600; }
+    .btn-my-deselect {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 6px;
+      border: 1px solid var(--border, rgba(255,255,255,.12));
+      cursor: pointer; font-size: .75rem; font-weight: 600;
+      background: transparent; color: var(--muted);
+      transition: background .15s;
+    }
+    .btn-my-deselect:hover { background: rgba(255,255,255,.05); }
+    .btn-my-zip {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 6px;
+      border: 1px solid rgba(16,185,129,.3);
+      cursor: pointer; font-size: .75rem; font-weight: 600;
+      background: rgba(16,185,129,.1); color: #6ee7b7;
+      transition: background .15s;
+    }
+    .btn-my-zip:hover { background: rgba(16,185,129,.18); }
+    .btn-my-zip:disabled { opacity: .5; cursor: not-allowed; }
+    .my-file-cb {
+      width: 15px; height: 15px; cursor: pointer;
+      accent-color: #10b981; flex-shrink: 0; margin-right: 6px;
+    }
+  </style>
 </head>
 <body>
 
@@ -146,6 +183,15 @@
           <svg id="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         </button>
       </div>
+    </div>
+    <!-- Selection bar (visible when ≥1 file is checked) -->
+    <div id="my-sel-bar" class="hidden">
+      <span id="my-sel-count"></span>
+      <button class="btn-my-deselect" id="btn-my-deselect">Deselect all</button>
+      <button class="btn-my-zip" id="btn-my-zip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Download as ZIP
+      </button>
     </div>
     <div id="my-files-list"></div>
   </div>
@@ -766,6 +812,7 @@ function renderMyFiles(files) {
   const list = $('my-files-list');
   if (files.length === 0) {
     list.innerHTML = '<div class="my-files-empty">No active files yet</div>';
+    updateMySelBar();
     return;
   }
 
@@ -774,6 +821,7 @@ function renderMyFiles(files) {
   } else {
     renderList(files, list);
   }
+  updateMySelBar();
 }
 
 function renderList(files, list) {
@@ -790,6 +838,7 @@ function renderList(files, list) {
       : `<div class="my-file-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>`;
     return `
     <div class="my-file-item">
+      <input type="checkbox" class="my-file-cb" data-id="${esc(f.id)}" data-encrypted="${f.encrypted ? '1' : '0'}">
       ${thumb}
       <div class="my-file-info">
         <div class="my-file-name">
@@ -820,6 +869,9 @@ function renderList(files, list) {
       btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> Copied`;
       setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
     });
+  });
+  list.querySelectorAll('.my-file-cb').forEach(cb => {
+    cb.addEventListener('change', updateMySelBar);
   });
 }
 
@@ -871,6 +923,9 @@ function renderGallery(files, container) {
       btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> Copied`;
       setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
     });
+  });
+  container.querySelectorAll('.my-file-cb').forEach(cb => {
+    cb.addEventListener('change', updateMySelBar);
   });
 }
 
@@ -926,6 +981,53 @@ function fmtExpRemaining(ms) {
 }
 
 $('btn-refresh-files').addEventListener('click', loadMyFiles);
+
+// ── My Files selection / ZIP ──────────────────────────────────────────────────
+function updateMySelBar() {
+  const checked = document.querySelectorAll('.my-file-cb:checked');
+  const bar = $('my-sel-bar');
+  if (!bar) return;
+  if (checked.length === 0) { bar.classList.add('hidden'); return; }
+  bar.classList.remove('hidden');
+  $('my-sel-count').textContent = checked.length + ' selected';
+}
+
+$('btn-my-deselect').addEventListener('click', () => {
+  document.querySelectorAll('.my-file-cb:checked').forEach(cb => { cb.checked = false; });
+  updateMySelBar();
+});
+
+$('btn-my-zip').addEventListener('click', async () => {
+  const ids = [...document.querySelectorAll('.my-file-cb:checked')].map(cb => cb.dataset.id);
+  if (!ids.length) return;
+  const btn = $('btn-my-zip');
+  const origHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Creating …';
+  try {
+    const r = await fetch('/api/my/download-zip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids })
+    });
+    if (!r.ok) { const d = await r.json().catch(() => ({})); alert(d.error || 'Download failed'); return; }
+    const skipped = parseInt(r.headers.get('X-Skipped-Files') || '0');
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `safedrop-${new Date().toISOString().slice(0, 10)}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    if (skipped > 0) alert(`${skipped} encrypted file(s) were skipped in the ZIP.`);
+  } catch (e) {
+    alert('Download failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHTML;
+  }
+});
 
 // ── Theme switcher + Date ─────────────────────────────────────────────────────
 window.fsTheme.renderSwitcher('theme-switcher');
