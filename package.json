@@ -1,7 +1,7 @@
 {
-  "name": "fileshare",
+  "name": "SafeDrop",
   "version": "1.0.0",
-  "description": "Temporary encrypted file sharing",
+  "description": "Self-hosted encrypted file sharing",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

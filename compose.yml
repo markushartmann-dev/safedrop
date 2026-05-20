@@ -1,7 +1,7 @@
 services:
-  fileshare:
+  safedrop:
     build: .
-    container_name: fileshare
+    container_name: SafeDrop
     restart: unless-stopped
     ports:
       - "3005:3000"
