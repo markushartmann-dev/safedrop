@@ -11,6 +11,7 @@
 - **Drag & Drop** – drop files or entire folders directly into the browser
 - **Folder upload** – folders are automatically compressed as ZIP (JSZip, DEFLATE level 6)
 - **Multi-file upload** – upload any number of files in a single session
+- **Multi-file ZIP download** – select multiple files via checkbox and download them as a single ZIP archive; encrypted files are decrypted on the fly if the correct password is provided
 
 ### Security & Encryption
 - **AES-256-GCM** – server-side encryption with authenticated ciphertext; the file is encrypted on the server after assembly
@@ -47,7 +48,7 @@
 |-----|---------|
 | Dashboard | Overall statistics (users, files, downloads, storage) |
 | Users | Create, lock/unlock, set password (custom or STIG-generated), delete |
-| Files | All active files, single and bulk delete, admin download |
+| Files | All active files, single/bulk delete, bulk ZIP download, admin download |
 | Transfers | Persistent upload log – includes deleted and expired files, guest uploads, IP addresses, and status badges (Active / Deleted / Expired) |
 | Storage | Storage usage broken down by user |
 | Settings | Bandwidth throttling (upload/download) in KB/s |
@@ -60,10 +61,21 @@ Admins can set any password for a user account via the **Users** tab → **PW re
 - The password is shown once after saving with a copy button
 - All active sessions of the affected user are immediately terminated
 
+#### Bulk ZIP download (Files tab)
+- Select any number of files via checkbox and click **Download as ZIP**
+- If encrypted files are selected, a password prompt appears
+- The server decrypts matching files on the fly and streams everything as a single ZIP
+- Files where the password doesn't match are skipped; the toast shows the skip count
+
 ### Bandwidth Throttling
 - Separate token-bucket throttling for **upload** and **download**
 - Configurable via admin UI in KB/s (0 = unlimited)
 - Default: 200 Mbit/s (25,600 KB/s)
+
+### Mobile Support
+- Fully responsive layout for phones (iPhone and Android)
+- Main page: header adapts, selection bar stacks, file list scales down
+- Admin panel: tab bar scrolls horizontally, stats grid collapses, bulk action bar stacks vertically
 
 ---
 
