@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -534,7 +534,7 @@
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
-        Abmelden
+        Sign out
       </button>
     </div>
   </header>
@@ -545,7 +545,7 @@
     <!-- Stats -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Benutzer gesamt</div>
+        <div class="stat-label">Total users</div>
         <div class="stat-value" id="stat-users">–</div>
         <div class="stat-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -557,7 +557,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Aktive Dateien</div>
+        <div class="stat-label">Active files</div>
         <div class="stat-value" id="stat-active">–</div>
         <div class="stat-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -567,7 +567,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Downloads gesamt</div>
+        <div class="stat-label">Total downloads</div>
         <div class="stat-value" id="stat-downloads">–</div>
         <div class="stat-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -578,7 +578,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Speicher (aktiv)</div>
+        <div class="stat-label">Storage (active)</div>
         <div class="stat-value" id="stat-storage">–</div>
         <div class="stat-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -594,8 +594,8 @@
     <div class="storage-card hidden" id="storage-card">
       <div class="storage-header">
         <div>
-          <div class="section-title">Speichernutzung nach Benutzer</div>
-          <div class="section-sub">Aktive Dateien · sortiert nach belegtem Speicher</div>
+          <div class="section-title">Storage usage by user</div>
+          <div class="section-sub">Active files · sorted by storage used</div>
         </div>
       </div>
       <div class="storage-body">
@@ -612,19 +612,19 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab active" data-tab="users">Benutzer</button>
-      <button class="tab" data-tab="files">Dateien</button>
-      <button class="tab" data-tab="transfers">Transfer-Protokoll</button>
-      <button class="tab" data-tab="syslog">Systemprotokoll</button>
-      <button class="tab" data-tab="settings">Einstellungen</button>
+      <button class="tab active" data-tab="users">Users</button>
+      <button class="tab" data-tab="files">Files</button>
+      <button class="tab" data-tab="transfers">Transfer log</button>
+      <button class="tab" data-tab="syslog">System log</button>
+      <button class="tab" data-tab="settings">Settings</button>
     </div>
 
     <!-- Users Tab -->
     <div id="tab-users">
       <div class="section-header">
         <div>
-          <div class="section-title">Benutzerverwaltung</div>
-          <div class="section-sub">Benutzer anlegen, sperren oder löschen</div>
+          <div class="section-title">User management</div>
+          <div class="section-sub">Create, disable, or delete users</div>
         </div>
         <button class="btn-primary" id="btn-create-user">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -633,23 +633,23 @@
             <line x1="19" y1="8" x2="19" y2="14"/>
             <line x1="22" y1="11" x2="16" y2="11"/>
           </svg>
-          Benutzer anlegen
+          Create user
         </button>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Benutzername</th>
-              <th>Rolle</th>
-              <th>Erstellt</th>
-              <th>Letzter Login</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Created</th>
+              <th>Last login</th>
               <th>Status</th>
-              <th>Aktionen</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="users-tbody">
-            <tr class="empty-row"><td colspan="6">Wird geladen …</td></tr>
+            <tr class="empty-row"><td colspan="6">Loading …</td></tr>
           </tbody>
         </table>
       </div>
@@ -659,23 +659,23 @@
     <div id="tab-files" class="hidden">
       <div class="section-header">
         <div>
-          <div class="section-title">Dateiverwaltung</div>
-          <div class="section-sub">Alle hochgeladenen Dateien</div>
+          <div class="section-title">File management</div>
+          <div class="section-sub">All uploaded files</div>
         </div>
         <button class="btn-primary" id="btn-refresh-files-admin" title="Aktualisieren">
           <svg id="files-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          Aktualisieren
+          Refresh
         </button>
       </div>
 
       <!-- Bulk action bar (hidden until rows selected) -->
       <div class="bulk-bar hidden" id="bulk-bar">
-        <span class="bulk-bar-left"><span id="bulk-count">0</span> Datei(en) ausgewählt</span>
+        <span class="bulk-bar-left"><span id="bulk-count">0</span> file(s) selected</span>
         <div class="bulk-bar-right">
-          <button class="btn-bulk-cancel" id="btn-bulk-cancel">Auswahl aufheben</button>
+          <button class="btn-bulk-cancel" id="btn-bulk-cancel">Deselect all</button>
           <button class="btn-bulk-del" id="btn-bulk-delete">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-            Ausgewählte löschen
+            Delete selected
           </button>
         </div>
       </div>
@@ -685,17 +685,17 @@
           <thead>
             <tr>
               <th class="cb-cell"><input type="checkbox" id="cb-all-files" title="Alle auswählen"></th>
-              <th class="sortable" data-col="original_name">Dateiname<i class="sort-icon">⇅</i></th>
+              <th class="sortable" data-col="original_name">Filename<i class="sort-icon">⇅</i></th>
               <th class="sortable" data-col="uploader">Uploader<i class="sort-icon">⇅</i></th>
-              <th class="sortable" data-col="size">Größe<i class="sort-icon">⇅</i></th>
-              <th class="sortable" data-col="created_at">Hochgeladen<i class="sort-icon">⇅</i></th>
-              <th class="sortable" data-col="expires_at">Läuft ab<i class="sort-icon">⇅</i></th>
+              <th class="sortable" data-col="size">Size<i class="sort-icon">⇅</i></th>
+              <th class="sortable" data-col="created_at">Uploaded<i class="sort-icon">⇅</i></th>
+              <th class="sortable" data-col="expires_at">Expires<i class="sort-icon">⇅</i></th>
               <th class="sortable" data-col="download_count">Downloads<i class="sort-icon">⇅</i></th>
-              <th>Aktionen</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="files-tbody">
-            <tr class="empty-row"><td colspan="8">Wird geladen …</td></tr>
+            <tr class="empty-row"><td colspan="8">Loading …</td></tr>
           </tbody>
         </table>
       </div>
@@ -705,24 +705,24 @@
     <div id="tab-settings" class="hidden">
       <div class="section-header">
         <div>
-          <div class="section-title">Systemeinstellungen</div>
-          <div class="section-sub">Bandbreite und Übertragungslimits</div>
+          <div class="section-title">System settings</div>
+          <div class="section-sub">Bandwidth and transfer limits</div>
         </div>
       </div>
 
       <div class="settings-card">
-        <div class="settings-card-title">Bandbreitenlimit</div>
-        <div class="settings-card-sub">0 KB/s = unbegrenzt. Die Drosselung wirkt pro Verbindung (Download) bzw. global (Upload).</div>
+        <div class="settings-card-title">Bandwidth limit</div>
+        <div class="settings-card-sub">0 KB/s = unlimited. Throttling applies per connection (download) or globally (upload).</div>
 
         <div class="settings-row">
           <div class="settings-field">
-            <label>Download-Limit</label>
+            <label>Download limit</label>
             <div class="settings-input-wrap">
               <input type="number" class="settings-input" id="set-dl" min="0" placeholder="25600" value="25600">
               <span class="settings-unit">KB/s</span>
             </div>
             <div class="bw-presets" id="dl-presets">
-              <button class="bw-pill" data-val="0"     data-target="set-dl">∞ Unbegrenzt</button>
+              <button class="bw-pill" data-val="0"     data-target="set-dl">∞ Unlimited</button>
               <button class="bw-pill" data-val="1280"  data-target="set-dl">10 Mbit</button>
               <button class="bw-pill" data-val="3200"  data-target="set-dl">25 Mbit</button>
               <button class="bw-pill" data-val="6400"  data-target="set-dl">50 Mbit</button>
@@ -733,13 +733,13 @@
           </div>
 
           <div class="settings-field">
-            <label>Upload-Limit</label>
+            <label>Upload limit</label>
             <div class="settings-input-wrap">
               <input type="number" class="settings-input" id="set-ul" min="0" placeholder="25600" value="25600">
               <span class="settings-unit">KB/s</span>
             </div>
             <div class="bw-presets" id="ul-presets">
-              <button class="bw-pill" data-val="0"     data-target="set-ul">∞ Unbegrenzt</button>
+              <button class="bw-pill" data-val="0"     data-target="set-ul">∞ Unlimited</button>
               <button class="bw-pill" data-val="1280"  data-target="set-ul">10 Mbit</button>
               <button class="bw-pill" data-val="3200"  data-target="set-ul">25 Mbit</button>
               <button class="bw-pill" data-val="6400"  data-target="set-ul">50 Mbit</button>
@@ -753,11 +753,11 @@
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <button class="btn-primary" id="btn-save-settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Einstellungen speichern
+            Save settings
           </button>
           <span class="bw-status hidden" id="settings-saved">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>
-            Gespeichert
+            Saved
           </span>
         </div>
       </div>
@@ -767,18 +767,18 @@
     <div id="tab-transfers" class="hidden">
       <div class="section-header">
         <div>
-          <div class="section-title">Transfer-Protokoll</div>
-          <div class="section-sub">Alle Uploads – Benutzer und Gäste</div>
+          <div class="section-title">Transfer log</div>
+          <div class="section-sub">All uploads – users and guests</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <div style="display:flex;gap:4px">
-            <button class="act-btn tlog-filter-btn active" data-filter="all">Alle</button>
-            <button class="act-btn tlog-filter-btn" data-filter="user">Nutzer</button>
-            <button class="act-btn tlog-filter-btn" data-filter="guest">Gäste</button>
+            <button class="act-btn tlog-filter-btn active" data-filter="all">All</button>
+            <button class="act-btn tlog-filter-btn" data-filter="user">Users</button>
+            <button class="act-btn tlog-filter-btn" data-filter="guest">Guests</button>
           </div>
           <button class="btn-primary" id="btn-refresh-transfers">
             <svg id="transfers-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Aktualisieren
+            Refresh
           </button>
         </div>
       </div>
@@ -786,18 +786,18 @@
         <table>
           <thead>
             <tr>
-              <th class="sortable" data-col="original_name" data-table="transfers">Dateiname<i class="sort-icon">⇅</i></th>
+              <th class="sortable" data-col="original_name" data-table="transfers">Filename<i class="sort-icon">⇅</i></th>
               <th class="sortable" data-col="uploader"       data-table="transfers">Uploader<i class="sort-icon">⇅</i></th>
-              <th class="sortable" data-col="size"           data-table="transfers">Größe<i class="sort-icon">⇅</i></th>
-              <th class="sortable" data-col="created_at"     data-table="transfers">Hochgeladen<i class="sort-icon">⇅</i></th>
-              <th class="sortable" data-col="expires_at"     data-table="transfers">Läuft ab<i class="sort-icon">⇅</i></th>
+              <th class="sortable" data-col="size"           data-table="transfers">Size<i class="sort-icon">⇅</i></th>
+              <th class="sortable" data-col="created_at"     data-table="transfers">Uploaded<i class="sort-icon">⇅</i></th>
+              <th class="sortable" data-col="expires_at"     data-table="transfers">Expires<i class="sort-icon">⇅</i></th>
               <th class="sortable" data-col="download_count" data-table="transfers">Downloads<i class="sort-icon">⇅</i></th>
-              <th>IP-Adresse</th>
-              <th>Aktionen</th>
+              <th>IP address</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="transfers-tbody">
-            <tr class="empty-row"><td colspan="8">Wird geladen …</td></tr>
+            <tr class="empty-row"><td colspan="8">Loading …</td></tr>
           </tbody>
         </table>
       </div>
@@ -807,20 +807,20 @@
     <div id="tab-syslog" class="hidden">
       <div class="section-header">
         <div>
-          <div class="section-title">Systemprotokoll</div>
-          <div class="section-sub">Automatische Ereignisse – Löschungen, Server-Starts, Geheimnisse</div>
+          <div class="section-title">System log</div>
+          <div class="section-sub">Automatic events – deletions, server starts, secrets</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <div style="display:flex;gap:4px" id="syslog-filter-btns">
-            <button class="act-btn tlog-filter-btn active" data-sysfilter="all">Alle</button>
-            <button class="act-btn tlog-filter-btn" data-sysfilter="file_expired">Abgelaufen</button>
-            <button class="act-btn tlog-filter-btn" data-sysfilter="file_deleted_admin">Manuell gelöscht</button>
-            <button class="act-btn tlog-filter-btn" data-sysfilter="secret">Geheimnisse</button>
+            <button class="act-btn tlog-filter-btn active" data-sysfilter="all">All</button>
+            <button class="act-btn tlog-filter-btn" data-sysfilter="file_expired">Expired</button>
+            <button class="act-btn tlog-filter-btn" data-sysfilter="file_deleted_admin">Manually deleted</button>
+            <button class="act-btn tlog-filter-btn" data-sysfilter="secret">Secrets</button>
             <button class="act-btn tlog-filter-btn" data-sysfilter="server_start">Server</button>
           </div>
           <button class="btn-primary" id="btn-refresh-syslog">
             <svg id="syslog-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Aktualisieren
+            Refresh
           </button>
         </div>
       </div>
@@ -828,13 +828,13 @@
         <table>
           <thead>
             <tr>
-              <th>Zeitpunkt</th>
-              <th>Typ</th>
-              <th>Ereignis</th>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Event</th>
             </tr>
           </thead>
           <tbody id="syslog-tbody">
-            <tr class="empty-row"><td colspan="3">Wird geladen …</td></tr>
+            <tr class="empty-row"><td colspan="3">Loading …</td></tr>
           </tbody>
         </table>
       </div>
@@ -850,8 +850,8 @@
     <div class="modal">
       <div class="modal-stripe"></div>
       <div class="modal-body">
-        <div class="modal-title">Neuen Benutzer anlegen</div>
-        <div class="modal-sub">Das Passwort wird automatisch generiert und einmalig angezeigt.</div>
+        <div class="modal-title">Create new user</div>
+        <div class="modal-sub">The password is generated automatically and shown once.</div>
 
         <div class="modal-err hidden" id="create-err">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -864,28 +864,28 @@
 
         <div id="create-form-section">
           <div class="modal-field">
-            <label for="new-username">Benutzername</label>
+            <label for="new-username">Username</label>
             <input class="modal-input" type="text" id="new-username"
-                   placeholder="z.B. max.mustermann" autocomplete="off">
+                   placeholder="e.g. j.smith" autocomplete="off">
           </div>
           <div class="modal-footer">
-            <button class="btn-modal-cancel" id="btn-create-cancel">Abbrechen</button>
+            <button class="btn-modal-cancel" id="btn-create-cancel">Cancel</button>
             <button class="btn-primary" id="btn-create-submit">
-              Anlegen
+              Create
             </button>
           </div>
         </div>
 
         <div id="create-success-section" class="hidden">
           <div class="modal-field">
-            <label>Benutzername</label>
+            <label>Username</label>
             <div class="mono" id="created-username-display" style="font-size:.9rem;padding:4px 0"></div>
           </div>
           <div class="modal-field" style="margin-bottom:0">
-            <label>Generiertes Passwort (einmalig sichtbar)</label>
+            <label>Generated password (shown once)</label>
             <div class="pw-result">
               <input type="text" id="created-pw-display" readonly>
-              <button class="pw-copy-btn" id="btn-copy-new-pw">Kopieren</button>
+              <button class="pw-copy-btn" id="btn-copy-new-pw">Copy</button>
             </div>
           </div>
           <div class="modal-notice">
@@ -894,10 +894,10 @@
               <line x1="12" y1="9" x2="12" y2="13"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            Dieses Passwort wird nicht erneut angezeigt. Bitte sicher aufbewahren oder direkt weitergeben.
+            This password will not be shown again. Please store it securely or pass it on directly.
           </div>
           <div class="modal-footer">
-            <button class="btn-primary" id="btn-create-done">Fertig</button>
+            <button class="btn-primary" id="btn-create-done">Done</button>
           </div>
         </div>
 
@@ -910,7 +910,7 @@
     <div class="modal">
       <div class="modal-stripe"></div>
       <div class="modal-body">
-        <div class="modal-title">Passwort eingeben</div>
+        <div class="modal-title">Enter password</div>
         <div class="modal-sub" id="dl-pw-filename" style="word-break:break-all"></div>
 
         <div class="modal-err hidden" id="dl-pw-err">
@@ -923,15 +923,15 @@
         </div>
 
         <div class="modal-field">
-          <label for="dl-pw-input">Datei-Passwort</label>
+          <label for="dl-pw-input">File password</label>
           <input class="modal-input" type="password" id="dl-pw-input"
                  placeholder="••••••••••••" autocomplete="off">
         </div>
         <div class="modal-footer">
-          <button class="btn-modal-cancel" id="btn-dl-pw-cancel">Abbrechen</button>
+          <button class="btn-modal-cancel" id="btn-dl-pw-cancel">Cancel</button>
           <button class="btn-primary" id="btn-dl-pw-confirm">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Herunterladen
+            Download
           </button>
         </div>
       </div>
@@ -943,15 +943,15 @@
     <div class="modal">
       <div class="modal-stripe"></div>
       <div class="modal-body">
-        <div class="modal-title">Passwort zurücksetzen</div>
-        <div class="modal-sub">Ein neues STIG-Passwort wird generiert. Alle aktiven Sessions des Benutzers werden beendet.</div>
+        <div class="modal-title">Reset password</div>
+        <div class="modal-sub">A new STIG password is generated. All active sessions for this user will be terminated.</div>
 
         <div id="pwreset-result-section" class="hidden">
           <div class="modal-field" style="margin-bottom:0">
-            <label>Neues Passwort (einmalig sichtbar)</label>
+            <label>New password (shown once)</label>
             <div class="pw-result">
               <input type="text" id="reset-pw-display" readonly>
-              <button class="pw-copy-btn" id="btn-copy-reset-pw">Kopieren</button>
+              <button class="pw-copy-btn" id="btn-copy-reset-pw">Copy</button>
             </div>
           </div>
           <div class="modal-notice">
@@ -960,7 +960,7 @@
               <line x1="12" y1="9" x2="12" y2="13"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            Dieses Passwort wird nicht erneut angezeigt.
+            This password will not be shown again.
           </div>
         </div>
 
@@ -970,12 +970,12 @@
               <circle cx="12" cy="12" r="10" stroke-opacity=".2"/>
               <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
             </svg>
-            Wird zurückgesetzt …
+            Resetting …
           </div>
         </div>
 
         <div class="modal-footer" id="pwreset-footer" style="display:none">
-          <button class="btn-primary" id="btn-pwreset-done">Fertig</button>
+          <button class="btn-primary" id="btn-pwreset-done">Done</button>
         </div>
       </div>
     </div>
@@ -1047,7 +1047,7 @@ async function loadUsers() {
     const users = await r.json();
     const tbody = $('users-tbody');
     if (!users.length) {
-      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Keine Benutzer gefunden</td></tr>';
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No users found</td></tr>';
       return;
     }
     tbody.innerHTML = users.map(u => `
@@ -1056,12 +1056,12 @@ async function loadUsers() {
         <td><span class="badge badge-${u.role === 'admin' ? 'admin-r' : 'user-r'}">${esc(u.role)}</span></td>
         <td class="mono">${fmtDate(u.created_at)}</td>
         <td class="mono">${u.last_login ? fmtDate(u.last_login) : '—'}</td>
-        <td><span class="badge badge-${u.active ? 'active' : 'inactive'}">${u.active ? 'Aktiv' : 'Gesperrt'}</span></td>
+        <td><span class="badge badge-${u.active ? 'active' : 'inactive'}">${u.active ? 'Active' : 'Disabled'}</span></td>
         <td>
           <div class="actions">
             <button class="act-btn warn-btn" onclick="resetPassword('${esc(u.id)}', '${esc(u.username)}')">PW reset</button>
-            <button class="act-btn" onclick="toggleUser('${esc(u.id)}', ${u.active})">${u.active ? 'Sperren' : 'Entsperren'}</button>
-            ${u.id !== currentUser.id ? `<button class="act-btn danger" onclick="deleteUser('${esc(u.id)}', '${esc(u.username)}')">Löschen</button>` : ''}
+            <button class="act-btn" onclick="toggleUser('${esc(u.id)}', ${u.active})">${u.active ? 'Disable' : 'Enable'}</button>
+            ${u.id !== currentUser.id ? `<button class="act-btn danger" onclick="deleteUser('${esc(u.id)}', '${esc(u.username)}')">Delete</button>` : ''}
           </div>
         </td>
       </tr>
@@ -1070,27 +1070,27 @@ async function loadUsers() {
 }
 
 async function toggleUser(id, currentActive) {
-  if (!confirm(currentActive ? 'Benutzer sperren?' : 'Benutzer entsperren?')) return;
+  if (!confirm(currentActive ? 'Disable user?' : 'Enable user?')) return;
   try {
     const r = await fetch(`/api/admin/users/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'toggleActive' })
     });
-    if (!r.ok) { const d = await r.json(); toast(d.error || 'Fehler', 'err'); return; }
-    toast(currentActive ? 'Benutzer gesperrt' : 'Benutzer entsperrt', 'ok');
+    if (!r.ok) { const d = await r.json(); toast(d.error || 'Error', 'err'); return; }
+    toast(currentActive ? 'User disabled' : 'User enabled', 'ok');
     loadUsers(); loadStats();
-  } catch { toast('Verbindungsfehler', 'err'); }
+  } catch { toast('Connection error', 'err'); }
 }
 
 async function deleteUser(id, username) {
-  if (!confirm(`Benutzer "${username}" wirklich löschen?`)) return;
+  if (!confirm(`Really delete user "${username}"?`)) return;
   try {
     const r = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
-    if (!r.ok) { const d = await r.json(); toast(d.error || 'Fehler', 'err'); return; }
-    toast('Benutzer gelöscht', 'ok');
+    if (!r.ok) { const d = await r.json(); toast(d.error || 'Error', 'err'); return; }
+    toast('User deleted', 'ok');
     loadUsers(); loadStats();
-  } catch { toast('Verbindungsfehler', 'err'); }
+  } catch { toast('Connection error', 'err'); }
 }
 
 // ── Create user modal ─────────────────────────────────────────────────────────
@@ -1114,13 +1114,13 @@ $('modal-create').addEventListener('click', e => {
 $('btn-create-submit').addEventListener('click', async () => {
   const username = $('new-username').value.trim();
   if (!username) {
-    $('create-err-msg').textContent = 'Bitte Benutzernamen eingeben.';
+    $('create-err-msg').textContent = 'Please enter a username.';
     $('create-err').classList.remove('hidden');
     return;
   }
   $('create-err').classList.add('hidden');
   $('btn-create-submit').disabled = true;
-  $('btn-create-submit').innerHTML = '<svg class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Wird angelegt …';
+  $('btn-create-submit').innerHTML = '<svg class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Creating …';
 
   try {
     const r = await fetch('/api/admin/users', {
@@ -1130,10 +1130,10 @@ $('btn-create-submit').addEventListener('click', async () => {
     });
     const d = await r.json();
     if (!r.ok) {
-      $('create-err-msg').textContent = d.error || 'Fehler beim Anlegen';
+      $('create-err-msg').textContent = d.error || 'Error creating user';
       $('create-err').classList.remove('hidden');
       $('btn-create-submit').disabled = false;
-      $('btn-create-submit').textContent = 'Anlegen';
+      $('btn-create-submit').textContent = 'Create';
       return;
     }
     $('created-username-display').textContent = d.username;
@@ -1142,28 +1142,28 @@ $('btn-create-submit').addEventListener('click', async () => {
     $('create-success-section').classList.remove('hidden');
     loadUsers(); loadStats();
   } catch {
-    $('create-err-msg').textContent = 'Verbindungsfehler.';
+    $('create-err-msg').textContent = 'Connection error.';
     $('create-err').classList.remove('hidden');
     $('btn-create-submit').disabled = false;
-    $('btn-create-submit').textContent = 'Anlegen';
+    $('btn-create-submit').textContent = 'Create';
   }
 });
 
 $('btn-copy-new-pw').addEventListener('click', () => {
   navigator.clipboard.writeText($('created-pw-display').value);
-  $('btn-copy-new-pw').textContent = '✓ Kopiert';
-  setTimeout(() => { $('btn-copy-new-pw').textContent = 'Kopieren'; }, 2000);
+  $('btn-copy-new-pw').textContent = '✓ Copied';
+  setTimeout(() => { $('btn-copy-new-pw').textContent = 'Copy'; }, 2000);
 });
 
 $('btn-create-done').addEventListener('click', () => {
   $('modal-create').classList.add('hidden');
   $('btn-create-submit').disabled = false;
-  $('btn-create-submit').textContent = 'Anlegen';
+  $('btn-create-submit').textContent = 'Create';
 });
 
 // ── PW Reset modal ────────────────────────────────────────────────────────────
 async function resetPassword(id, username) {
-  if (!confirm(`Passwort von "${username}" zurücksetzen?`)) return;
+  if (!confirm(`Reset password for "${username}"?`)) return;
   $('reset-pw-display').value = '';
   $('pwreset-result-section').classList.add('hidden');
   $('pwreset-loading-section').classList.remove('hidden');
@@ -1180,7 +1180,7 @@ async function resetPassword(id, username) {
     $('pwreset-loading-section').classList.add('hidden');
     if (!r.ok) {
       $('modal-pwreset').classList.add('hidden');
-      toast(d.error || 'Fehler', 'err');
+      toast(d.error || 'Error', 'err');
       return;
     }
     $('reset-pw-display').value = d.password;
@@ -1188,14 +1188,14 @@ async function resetPassword(id, username) {
     $('pwreset-footer').style.display = 'flex';
   } catch {
     $('modal-pwreset').classList.add('hidden');
-    toast('Verbindungsfehler', 'err');
+    toast('Connection error', 'err');
   }
 }
 
 $('btn-copy-reset-pw').addEventListener('click', () => {
   navigator.clipboard.writeText($('reset-pw-display').value);
-  $('btn-copy-reset-pw').textContent = '✓ Kopiert';
-  setTimeout(() => { $('btn-copy-reset-pw').textContent = 'Kopieren'; }, 2000);
+  $('btn-copy-reset-pw').textContent = '✓ Copied';
+  setTimeout(() => { $('btn-copy-reset-pw').textContent = 'Copy'; }, 2000);
 });
 
 $('btn-pwreset-done').addEventListener('click', () => {
@@ -1269,7 +1269,7 @@ function renderFilesTable() {
   const tbody = $('files-tbody');
   updateSortHeaders('#tab-files table', _filesSort);
   if (!_filesData.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Keine Dateien gefunden</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No files found</td></tr>';
     return;
   }
   const sorted = sortData(_filesData, _filesSort.col, _filesSort.dir);
@@ -1281,7 +1281,7 @@ function renderFilesTable() {
         <td class="cb-cell"><input type="checkbox" class="file-cb" data-id="${esc(f.id)}"></td>
         <td>
           <div style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(f.original_name)}">${esc(f.original_name)}</div>
-          ${f.encrypted ? '<span class="badge badge-enc">Verschlüsselt</span>' : ''}
+          ${f.encrypted ? '<span class="badge badge-enc">Encrypted</span>' : ''}
         </td>
         <td class="mono">${esc(f.uploader || '—')}</td>
         <td class="mono">${fmtBytes(f.size)}</td>
@@ -1294,7 +1294,7 @@ function renderFilesTable() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download
             </button>
-            <button class="act-btn danger" onclick="deleteFile('${esc(f.id)}', '${esc(f.original_name)}')">Löschen</button>
+            <button class="act-btn danger" onclick="deleteFile('${esc(f.id)}', '${esc(f.original_name)}')">Delete</button>
           </div>
         </td>
       </tr>
@@ -1344,7 +1344,7 @@ $('btn-bulk-cancel').addEventListener('click', clearSelection);
 $('btn-bulk-delete').addEventListener('click', async () => {
   const ids = getSelectedIds();
   if (!ids.length) return;
-  if (!confirm(`${ids.length} Datei(en) wirklich löschen?`)) return;
+  if (!confirm(`Really delete ${ids.length} file(s)?`)) return;
   try {
     const r = await fetch('/api/admin/files/bulk-delete', {
       method: 'POST',
@@ -1352,25 +1352,25 @@ $('btn-bulk-delete').addEventListener('click', async () => {
       body: JSON.stringify({ ids })
     });
     const d = await r.json();
-    if (!r.ok) { toast(d.error || 'Fehler', 'err'); return; }
-    toast(`${d.deleted} Datei(en) gelöscht`, 'ok');
+    if (!r.ok) { toast(d.error || 'Error', 'err'); return; }
+    toast(`${d.deleted} file(s) deleted`, 'ok');
     loadFiles(); loadStats();
-  } catch { toast('Verbindungsfehler', 'err'); }
+  } catch { toast('Connection error', 'err'); }
 });
 
 async function deleteFile(id, name) {
-  if (!confirm(`Datei "${name}" wirklich löschen?`)) return;
+  if (!confirm(`Really delete file "${name}"?`)) return;
   try {
     const r = await fetch(`/api/admin/files/${id}`, { method: 'DELETE' });
-    if (!r.ok) { const d = await r.json(); toast(d.error || 'Fehler', 'err'); return; }
-    toast('Datei gelöscht', 'ok');
+    if (!r.ok) { const d = await r.json(); toast(d.error || 'Error', 'err'); return; }
+    toast('File deleted', 'ok');
     loadFiles(); loadStats();
-  } catch { toast('Verbindungsfehler', 'err'); }
+  } catch { toast('Connection error', 'err'); }
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 function kbpsToLabel(kbps) {
-  if (!kbps) return 'Unbegrenzt';
+  if (!kbps) return 'Unlimited';
   if (kbps >= 1024) return (kbps / 1024).toFixed(1).replace('.0','') + ' MB/s ≈ ' + (kbps * 8 / 1024).toFixed(0) + ' Mbit/s';
   return kbps + ' KB/s';
 }
@@ -1381,7 +1381,7 @@ function syncPillsForInput(inputId, presetsId) {
     p.classList.toggle('active', parseInt(p.dataset.val) === val);
   });
   const hint = $(inputId === 'set-dl' ? 'dl-hint' : 'ul-hint');
-  hint.textContent = val > 0 ? '≈ ' + kbpsToLabel(val) : 'Keine Drosselung';
+  hint.textContent = val > 0 ? '≈ ' + kbpsToLabel(val) : 'No throttling';
 }
 
 ['dl', 'ul'].forEach(dir => {
@@ -1418,12 +1418,12 @@ $('btn-save-settings').addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ download_limit_kbps: dl, upload_limit_kbps: ul })
     });
-    if (!r.ok) { const d = await r.json(); toast(d.error || 'Fehler', 'err'); return; }
+    if (!r.ok) { const d = await r.json(); toast(d.error || 'Error', 'err'); return; }
     const saved = $('settings-saved');
     saved.classList.remove('hidden');
     setTimeout(() => saved.classList.add('hidden'), 3000);
-    toast('Einstellungen gespeichert', 'ok');
-  } catch { toast('Verbindungsfehler', 'err'); }
+    toast('Settings saved', 'ok');
+  } catch { toast('Connection error', 'err'); }
   finally { $('btn-save-settings').disabled = false; }
 });
 
@@ -1486,7 +1486,7 @@ function renderTransfersTable() {
   if (_transfersFilter === 'user')  data = data.filter(f => !f.is_guest);
 
   if (!data.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">${_transfersFilter !== 'all' ? 'Keine passenden Einträge' : 'Noch keine Transfers vorhanden'}</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">${_transfersFilter !== 'all' ? 'No matching entries' : 'No transfers yet'}</td></tr>`;
     return;
   }
 
@@ -1496,16 +1496,16 @@ function renderTransfersTable() {
     const expired  = f.expires_at < now;
     const unlim    = f.expires_at > now + 50*365*24*3600*1000;
     const expLabel = unlim ? '∞ Unbegrenzt' : fmtDate(f.expires_at);
-    const guestBadge = f.is_guest ? ' <span class="badge" style="background:rgba(245,158,11,.12);color:#d97706;border:1px solid rgba(245,158,11,.3)">Gast</span>' : '';
+    const guestBadge = f.is_guest ? ' <span class="badge" style="background:rgba(245,158,11,.12);color:#d97706;border:1px solid rgba(245,158,11,.3)">Guest</span>' : '';
     return `<tr>
       <td>
         <div style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(f.original_name)}">${esc(f.original_name)}</div>
-        ${f.encrypted ? '<span class="badge badge-enc">🔒 Verschlüsselt</span>' : ''}
+        ${f.encrypted ? '<span class="badge badge-enc">🔒 Encrypted</span>' : ''}
       </td>
       <td class="mono">${esc(f.uploader || '—')}${guestBadge}</td>
       <td class="mono">${fmtBytes(f.size)}</td>
       <td class="mono">${fmtDate(f.created_at)}</td>
-      <td class="mono" style="${expired ? 'color:var(--err)' : ''}">${expired ? '⏰ Abgelaufen' : expLabel}</td>
+      <td class="mono" style="${expired ? 'color:var(--err)' : ''}">${expired ? '⏰ Expired' : expLabel}</td>
       <td class="mono">${f.download_count}${f.max_downloads ? ' / ' + f.max_downloads : ''}</td>
       <td class="mono" style="color:var(--mt);font-size:.72rem">${esc(f.uploader_ip || '—')}</td>
       <td>
@@ -1514,7 +1514,7 @@ function renderTransfersTable() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Download
           </button>
-          <button class="act-btn danger" onclick="deleteTransfer('${esc(f.id)}','${esc(f.original_name)}')">Löschen</button>
+          <button class="act-btn danger" onclick="deleteTransfer('${esc(f.id)}','${esc(f.original_name)}')">Delete</button>
         </div>
       </td>
     </tr>`;
@@ -1522,20 +1522,20 @@ function renderTransfersTable() {
 }
 
 async function deleteTransfer(id, name) {
-  if (!confirm(`Datei "${name}" löschen?`)) return;
+  if (!confirm(`Delete file "${name}"?`)) return;
   try {
     const r = await fetch(`/api/admin/files/${id}`, { method: 'DELETE' });
-    if (!r.ok) { const d = await r.json(); toast(d.error || 'Fehler', 'err'); return; }
-    toast('Datei gelöscht', 'ok');
+    if (!r.ok) { const d = await r.json(); toast(d.error || 'Error', 'err'); return; }
+    toast('File deleted', 'ok');
     loadTransfers(); loadStats();
-  } catch { toast('Verbindungsfehler', 'err'); }
+  } catch { toast('Connection error', 'err'); }
 }
 
 // ── Admin Download ────────────────────────────────────────────────────────────
 let _dlTarget = null; // { id, name }
 
-const DL_BTN_HTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Herunterladen';
-const DL_BTN_BUSY = '<svg class="spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Wird geladen …';
+const DL_BTN_HTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download';
+const DL_BTN_BUSY = '<svg class="spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Loading …';
 
 function adminDownload(id, name, encrypted) {
   if (encrypted) {
@@ -1577,7 +1577,7 @@ $('btn-dl-pw-confirm').addEventListener('click', async () => {
   if (!_dlTarget) return;
   const pw = $('dl-pw-input').value.trim();
   if (!pw) {
-    $('dl-pw-err-msg').textContent = 'Bitte Passwort eingeben.';
+    $('dl-pw-err-msg').textContent = 'Please enter a password.';
     $('dl-pw-err').classList.remove('hidden');
     return;
   }
@@ -1594,7 +1594,7 @@ $('btn-dl-pw-confirm').addEventListener('click', async () => {
 
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
-      $('dl-pw-err-msg').textContent = d.error || 'Fehler beim Download.';
+      $('dl-pw-err-msg').textContent = d.error || 'Download error.';
       $('dl-pw-err').classList.remove('hidden');
       return;
     }
@@ -1611,10 +1611,10 @@ $('btn-dl-pw-confirm').addEventListener('click', async () => {
     setTimeout(() => { URL.revokeObjectURL(objUrl); a.remove(); }, 3000);
 
     $('modal-dl-pw').classList.add('hidden');
-    toast('Download gestartet', 'ok');
+    toast('Download started', 'ok');
     _dlTarget = null;
   } catch {
-    $('dl-pw-err-msg').textContent = 'Verbindungsfehler.';
+    $('dl-pw-err-msg').textContent = 'Connection error.';
     $('dl-pw-err').classList.remove('hidden');
   } finally {
     btn.disabled = false;
@@ -1627,13 +1627,13 @@ let _syslogData   = [];
 let _syslogFilter = 'all';
 
 const SYSLOG_BADGES = {
-  server_start:         { label: 'Server-Start',   color: 'rgba(99,102,241,.15)',  tc: '#818cf8',  bc: 'rgba(99,102,241,.3)' },
-  file_expired:         { label: 'Auto-Löschung',  color: 'rgba(245,158,11,.1)',   tc: '#d97706',  bc: 'rgba(245,158,11,.3)' },
-  file_deleted_admin:   { label: 'Manuell gelöscht', color: 'rgba(239,68,68,.1)', tc: '#fca5a5',  bc: 'rgba(239,68,68,.3)'  },
-  files_deleted_admin:  { label: 'Bulk-Löschung',  color: 'rgba(239,68,68,.1)',    tc: '#fca5a5',  bc: 'rgba(239,68,68,.3)'  },
-  secret_created:       { label: 'Geheimnis erstellt', color: 'rgba(16,185,129,.1)', tc: '#6ee7b7', bc: 'rgba(16,185,129,.3)' },
-  secret_viewed:        { label: 'Geheimnis abgerufen', color: 'rgba(6,182,212,.1)', tc: '#67e8f9', bc: 'rgba(6,182,212,.3)'  },
-  secret_expired:       { label: 'Geheimnis abgelaufen', color: 'rgba(148,163,184,.08)', tc: 'var(--dm)', bc: 'var(--bdr)' },
+  server_start:         { label: 'Server start',      color: 'rgba(99,102,241,.15)',  tc: '#818cf8',  bc: 'rgba(99,102,241,.3)' },
+  file_expired:         { label: 'Auto-deleted',       color: 'rgba(245,158,11,.1)',   tc: '#d97706',  bc: 'rgba(245,158,11,.3)' },
+  file_deleted_admin:   { label: 'Manually deleted',   color: 'rgba(239,68,68,.1)',    tc: '#fca5a5',  bc: 'rgba(239,68,68,.3)'  },
+  files_deleted_admin:  { label: 'Bulk delete',        color: 'rgba(239,68,68,.1)',    tc: '#fca5a5',  bc: 'rgba(239,68,68,.3)'  },
+  secret_created:       { label: 'Secret created',     color: 'rgba(16,185,129,.1)',   tc: '#6ee7b7',  bc: 'rgba(16,185,129,.3)' },
+  secret_viewed:        { label: 'Secret viewed',      color: 'rgba(6,182,212,.1)',    tc: '#67e8f9',  bc: 'rgba(6,182,212,.3)'  },
+  secret_expired:       { label: 'Secret expired',     color: 'rgba(148,163,184,.08)', tc: 'var(--dm)', bc: 'var(--bdr)' },
 };
 
 function syslogBadge(type) {
@@ -1676,7 +1676,7 @@ function renderSyslogTable() {
     }
   }
   if (!data.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">Keine Einträge gefunden</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No entries found</td></tr>';
     return;
   }
   tbody.innerHTML = data.map(e => {
@@ -1719,7 +1719,7 @@ async function loadStorage() {
     });
     $('donut-chart').style.background = `conic-gradient(${segs.join(', ')})`;
     $('donut-total').textContent = fmtBytes(total);
-    $('donut-sub').textContent = data.reduce((s, d) => s + d.file_count, 0) + ' Dateien';
+    $('donut-sub').textContent = data.reduce((s, d) => s + d.file_count, 0) + ' files';
 
     // Bar list
     $('storage-bars').innerHTML = data.map((d, i) => {
@@ -1730,7 +1730,7 @@ async function loadStorage() {
         <div class="sbar-info">
           <div class="sbar-meta">
             <span class="sbar-name" title="${esc(d.username)}">${esc(d.username)}</span>
-            <span class="sbar-right">${fmtBytes(d.used_bytes)} · ${d.file_count} Datei${d.file_count !== 1 ? 'en' : ''}</span>
+            <span class="sbar-right">${fmtBytes(d.used_bytes)} · ${d.file_count} file${d.file_count !== 1 ? 's' : ''}</span>
           </div>
           <div class="sbar-track"><div class="sbar-fill" style="width:${pct}%;background:${c}"></div></div>
         </div>
@@ -1752,7 +1752,7 @@ function fmtBytes(b) {
 }
 function fmtDate(ts) {
   if (!ts) return '—';
-  return new Date(ts).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  return new Date(ts).toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 function esc(s) {
   if (s == null) return '';
@@ -1761,7 +1761,7 @@ function esc(s) {
 
 init();
 window.fsTheme.renderSwitcher('theme-switcher');
-$('date-chip').textContent = new Date().toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+$('date-chip').textContent = new Date().toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
 </script>
 </body>
 </html>

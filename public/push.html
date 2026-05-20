@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Passwort Pusher – SafeDrop</title>
+  <title>Password Pusher – SafeDrop</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script src="/theme.js"></script>
   <link rel="stylesheet" href="/style.css">
@@ -21,7 +21,7 @@
     <span class="header-username" id="header-username"></span>
     <a class="header-admin-link" href="/">← SafeDrop</a>
     <a class="header-admin-link hidden" id="header-admin-link" href="/admin">Admin</a>
-    <button class="btn-header-logout" id="btn-logout">Abmelden</button>
+    <button class="btn-header-logout" id="btn-logout">Sign out</button>
   </div>
 </header>
 
@@ -37,13 +37,13 @@
           <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
       </div>
-      <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:4px">Passwort Pusher</h2>
-      <p style="font-size:.8rem;color:var(--muted)">Geheimnis sicher teilen — selbst­zerstörend nach Abruf</p>
+      <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:4px">Password Pusher</h2>
+      <p style="font-size:.8rem;color:var(--muted)">Share secrets securely — self-destructing after retrieval</p>
     </div>
 
     <!-- Secret textarea -->
     <div style="margin-bottom:18px">
-      <span class="opt-label">Geheimnis</span>
+      <span class="opt-label">Secret</span>
       <textarea id="secret-text" rows="5"
         placeholder="Passwort, API-Key, PIN, Nachricht …"
         style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:monospace;font-size:.85rem;outline:none;resize:vertical;line-height:1.6;transition:border-color .15s,box-shadow .15s"
@@ -54,7 +54,7 @@
         <span style="font-size:.72rem;color:var(--muted)" id="char-count">0 / 50.000</span>
         <button class="btn-gen-pw" id="btn-gen-secret" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          STIG-Passwort generieren
+          Generate STIG password
         </button>
       </div>
     </div>
@@ -63,10 +63,10 @@
 
       <!-- Views -->
       <div>
-        <span class="opt-label">Max. Ansichten</span>
-        <p class="opt-hint" style="margin-bottom:7px">Geheimnis wird nach dieser Anzahl von Abrufen gelöscht</p>
+        <span class="opt-label">Max. views</span>
+        <p class="opt-hint" style="margin-bottom:7px">Secret is deleted after this number of retrievals</p>
         <div class="pills" id="pills-views">
-          <button class="pill active" data-v="1">1× (einmalig)</button>
+          <button class="pill active" data-v="1">1× (once)</button>
           <button class="pill" data-v="2">2×</button>
           <button class="pill" data-v="3">3×</button>
           <button class="pill" data-v="5">5×</button>
@@ -76,13 +76,13 @@
 
       <!-- Expiry -->
       <div>
-        <span class="opt-label">Ablaufdatum</span>
+        <span class="opt-label">Expiry</span>
         <div class="pills" id="pills-expiry">
-          <button class="pill" data-e="3600">1 Std</button>
-          <button class="pill" data-e="14400">4 Std</button>
-          <button class="pill active" data-e="86400">1 Tag</button>
-          <button class="pill" data-e="259200">3 Tage</button>
-          <button class="pill" data-e="604800">7 Tage</button>
+          <button class="pill" data-e="3600">1 hr</button>
+          <button class="pill" data-e="14400">4 hrs</button>
+          <button class="pill active" data-e="86400">1 day</button>
+          <button class="pill" data-e="259200">3 days</button>
+          <button class="pill" data-e="604800">7 days</button>
         </div>
       </div>
 
@@ -90,8 +90,8 @@
       <div>
         <div class="toggle-row">
           <div>
-            <span class="opt-label" style="margin-bottom:2px">Passwort-Schutz</span>
-            <p class="opt-hint">Empfänger muss ein Passwort eingeben</p>
+            <span class="opt-label" style="margin-bottom:2px">Password protection</span>
+            <p class="opt-hint">Recipient must enter a password</p>
           </div>
           <label class="toggle">
             <input type="checkbox" id="pp-toggle">
@@ -100,13 +100,13 @@
         </div>
         <div class="pw-fields hidden" id="pp-fields">
           <div class="pw-gen-row">
-            <input type="text" id="pp-display" class="input input-mono" placeholder="Passwort für Empfänger">
+            <input type="text" id="pp-display" class="input input-mono" placeholder="Password for recipient">
             <button class="btn-copy-pw hidden" id="btn-copy-pp" title="Kopieren">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             </button>
             <button class="btn-gen-pw" id="btn-gen-pp" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              Generieren
+              Generate
             </button>
           </div>
         </div>
@@ -118,7 +118,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
         <path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9z"/>
       </svg>
-      Link erstellen
+      Create link
     </button>
 
   </div>
@@ -128,22 +128,22 @@
     <div class="success-icon" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);color:var(--accent)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9z"/></svg>
     </div>
-    <h2 class="success-title">Link erstellt!</h2>
-    <p class="success-subtitle">Link teilen — Geheimnis wird nach Abruf gelöscht.</p>
+    <h2 class="success-title">Link created!</h2>
+    <p class="success-subtitle">Share the link — secret is deleted after retrieval.</p>
 
     <div class="share-box">
       <input type="text" class="share-url-input" id="result-url" readonly>
-      <button class="btn-copy-result" id="btn-copy-link">Kopieren</button>
+      <button class="btn-copy-result" id="btn-copy-link">Copy</button>
     </div>
 
     <div class="result-meta" id="result-meta" style="margin-top:14px"></div>
 
     <div id="pw-hint-box" class="hidden" style="margin-top:12px;padding:11px 14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:9px;font-size:.78rem;color:var(--warn);display:flex;gap:8px;align-items:flex-start">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <div>Dieses Geheimnis ist <strong>passwort-geschützt</strong>. Teile das Passwort separat (z.B. per Telefon): <code id="result-passphrase" style="font-family:monospace;background:rgba(0,0,0,.15);padding:1px 6px;border-radius:4px"></code></div>
+      <div>This secret is <strong>password-protected</strong>. Share the password separately (e.g. by phone): <code id="result-passphrase" style="font-family:monospace;background:rgba(0,0,0,.15);padding:1px 6px;border-radius:4px"></code></div>
     </div>
 
-    <button class="btn-ghost mt" id="btn-new-push">Weiteres Geheimnis erstellen</button>
+    <button class="btn-ghost mt" id="btn-new-push">Create another secret</button>
   </div>
 
 </main>
@@ -191,7 +191,7 @@ document.querySelectorAll('#pills-expiry .pill').forEach(b => {
 // ── Text input ────────────────────────────────────────────────────────────────
 function onTextInput() {
   const len = $('secret-text').value.length;
-  $('char-count').textContent = len.toLocaleString('de-DE') + ' / 50.000';
+  $('char-count').textContent = len.toLocaleString('en-GB') + ' / 50,000';
   $('btn-push').disabled = len === 0 || len > 50000;
 }
 
@@ -200,11 +200,11 @@ $('btn-gen-secret').addEventListener('click', async () => {
   $('btn-gen-secret').disabled = true;
   try {
     const r = await fetch('/api/password/generate');
-    if (!r.ok) throw new Error('Fehler');
+    if (!r.ok) throw new Error('Error');
     const d = await r.json();
     $('secret-text').value = d.password;
     onTextInput();
-  } catch { alert('Fehler beim Generieren.'); }
+  } catch { alert('Error generating password.'); }
   $('btn-gen-secret').disabled = false;
 });
 
@@ -222,12 +222,12 @@ $('btn-gen-pp').addEventListener('click', async () => {
   $('btn-gen-pp').disabled = true;
   try {
     const r = await fetch('/api/password/generate');
-    if (!r.ok) throw new Error('Fehler');
+    if (!r.ok) throw new Error('Error');
     const d = await r.json();
     generatedPP = d.password;
     $('pp-display').value = d.password;
     $('btn-copy-pp').classList.remove('hidden');
-  } catch { alert('Fehler beim Generieren.'); }
+  } catch { alert('Error generating password.'); }
   $('btn-gen-pp').disabled = false;
 });
 
@@ -250,11 +250,11 @@ $('btn-push').addEventListener('click', async () => {
   let passphrase = null;
   if (usePassphrase) {
     passphrase = $('pp-display').value.trim();
-    if (!passphrase) { alert('Bitte Passwort eingeben oder generieren.'); return; }
+    if (!passphrase) { alert('Please enter or generate a password.'); return; }
   }
 
   $('btn-push').disabled = true;
-  $('btn-push').innerHTML = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Wird erstellt …';
+  $('btn-push').innerHTML = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Creating …';
 
   try {
     const r = await fetch('/api/secret', {
@@ -263,16 +263,16 @@ $('btn-push').addEventListener('click', async () => {
       body: JSON.stringify({ content, viewsMax: selectedViews, expiresIn: selectedExpiry, passphrase })
     });
     const d = await r.json();
-    if (!r.ok) { alert(d.error || 'Fehler'); return; }
+    if (!r.ok) { alert(d.error || 'Error'); return; }
 
     const url = location.origin + d.url;
     $('result-url').value = url;
 
     const expiryLabel = fmtDur(selectedExpiry);
     $('result-meta').innerHTML = `
-      <div class="meta-row"><span class="meta-label">Max. Ansichten</span><span class="meta-value">${selectedViews}×</span></div>
-      <div class="meta-row"><span class="meta-label">Läuft ab in</span><span class="meta-value">${expiryLabel}</span></div>
-      <div class="meta-row"><span class="meta-label">Passwort-Schutz</span><span class="meta-value">${usePassphrase ? '✓ Ja' : '—'}</span></div>`;
+      <div class="meta-row"><span class="meta-label">Max. views</span><span class="meta-value">${selectedViews}×</span></div>
+      <div class="meta-row"><span class="meta-label">Expires in</span><span class="meta-value">${expiryLabel}</span></div>
+      <div class="meta-row"><span class="meta-label">Password protection</span><span class="meta-value">${usePassphrase ? '✓ Yes' : '—'}</span></div>`;
 
     if (usePassphrase && passphrase) {
       $('result-passphrase').textContent = passphrase;
@@ -285,18 +285,18 @@ $('btn-push').addEventListener('click', async () => {
     $('card-result').classList.remove('hidden');
 
   } catch (e) {
-    alert('Verbindungsfehler: ' + e.message);
+    alert('Connection error: ' + e.message);
   } finally {
     $('btn-push').disabled = false;
-    $('btn-push').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9z"/></svg> Link erstellen';
+    $('btn-push').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9z"/></svg> Create link';
   }
 });
 
 $('btn-copy-link').addEventListener('click', function() {
   navigator.clipboard.writeText($('result-url').value);
-  this.textContent = '✓ Kopiert';
+  this.textContent = '✓ Copied';
   this.classList.add('copied');
-  setTimeout(() => { this.textContent = 'Kopieren'; this.classList.remove('copied'); }, 2000);
+  setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 2000);
 });
 
 $('btn-new-push').addEventListener('click', () => {
@@ -318,13 +318,13 @@ $('btn-new-push').addEventListener('click', () => {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmtDur(s) {
-  if (s < 3600) return Math.round(s / 60) + ' Minuten';
-  if (s < 86400) return (s / 3600).toFixed(0) + ' Stunden';
-  return (s / 86400).toFixed(0) + ' Tage';
+  if (s < 3600) return Math.round(s / 60) + ' minutes';
+  if (s < 86400) return (s / 3600).toFixed(0) + ' hours';
+  return (s / 86400).toFixed(0) + ' days';
 }
 
 window.fsTheme.renderSwitcher('theme-switcher');
-$('date-chip').textContent = new Date().toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+$('date-chip').textContent = new Date().toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
 </script>
 </body>
 </html>

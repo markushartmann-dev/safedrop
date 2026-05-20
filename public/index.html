@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +22,7 @@
     <span class="header-username" id="header-username"></span>
     <a class="header-admin-link" href="/push" style="background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.2);color:#6ee7b7" onmouseover="this.style.background='rgba(16,185,129,.14)'" onmouseout="this.style.background='rgba(16,185,129,.08)'">🔐 Pusher</a>
     <a class="header-admin-link hidden" id="header-admin-link" href="/admin">Admin</a>
-    <button class="btn-header-logout" id="btn-logout">Abmelden</button>
+    <button class="btn-header-logout" id="btn-logout">Sign out</button>
   </div>
 </header>
 
@@ -31,7 +31,7 @@
   <!-- Guest banner -->
   <div class="guest-banner hidden" id="guest-banner">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <div><strong>Gast-Modus:</strong> Dateien laufen nach max. 4 Stunden ab und müssen verschlüsselt sein. Kein Konto erforderlich.</div>
+    <div><strong>Guest mode:</strong> Files expire after a maximum of 4 hours and must be encrypted. No account required.</div>
   </div>
 
   <!-- Upload card -->
@@ -45,15 +45,15 @@
           <line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
       </div>
-      <h2 id="drop-title">Datei oder Ordner ablegen</h2>
+      <h2 id="drop-title">Drop file or folder here</h2>
       <p>
-        <label class="browse" for="file-input">Datei auswählen</label>
+        <label class="browse" for="file-input">Choose file</label>
         &nbsp;·&nbsp;
-        <span class="browse" id="btn-folder-pick" role="button" tabindex="0">Ordner auswählen</span>
+        <span class="browse" id="btn-folder-pick" role="button" tabindex="0">Choose folder</span>
       </p>
       <div class="drop-zone-hint">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        Ordner werden automatisch als ZIP komprimiert
+        Folders are automatically compressed as ZIP
       </div>
       <input type="file" id="file-input" hidden multiple>
     </div>
@@ -63,25 +63,25 @@
     <div class="options">
 
       <div>
-        <span class="opt-label">Ablaufdatum</span>
+        <span class="opt-label">Expiry</span>
         <div class="pills" id="pills">
-          <button class="pill" data-s="3600">1 Std</button>
-          <button class="pill" data-s="7200">2 Std</button>
-          <button class="pill" data-s="14400">4 Std</button>
-          <button class="pill" data-s="21600">6 Std</button>
-          <button class="pill active" data-s="86400">1 Tag</button>
-          <button class="pill" data-s="259200">3 Tage</button>
-          <button class="pill" data-s="604800">7 Tage</button>
-          <button class="pill" data-s="2592000">30 Tage</button>
-          <button class="pill" data-s="0">Unbegrenzt</button>
+          <button class="pill" data-s="3600">1 hr</button>
+          <button class="pill" data-s="7200">2 hrs</button>
+          <button class="pill" data-s="14400">4 hrs</button>
+          <button class="pill" data-s="21600">6 hrs</button>
+          <button class="pill active" data-s="86400">1 day</button>
+          <button class="pill" data-s="259200">3 days</button>
+          <button class="pill" data-s="604800">7 days</button>
+          <button class="pill" data-s="2592000">30 days</button>
+          <button class="pill" data-s="0">Unlimited</button>
         </div>
       </div>
 
       <div>
         <div class="toggle-row">
           <div>
-            <span class="opt-label" style="margin-bottom:2px">Passwortschutz</span>
-            <p class="opt-hint">AES-256 Verschlüsselung</p>
+            <span class="opt-label" style="margin-bottom:2px">Password protection</span>
+            <p class="opt-hint">AES-256 encryption</p>
           </div>
           <label class="toggle">
             <input type="checkbox" id="pw-toggle">
@@ -90,8 +90,8 @@
         </div>
         <div class="pw-fields hidden" id="pw-fields">
           <div class="pw-gen-row">
-            <input type="text" id="pw-display" class="input input-mono" readonly placeholder="Noch kein Passwort generiert">
-            <button class="btn-copy-pw hidden" id="btn-copy-pw" title="In Zwischenablage kopieren">
+            <input type="text" id="pw-display" class="input input-mono" readonly placeholder="No password generated yet">
+            <button class="btn-copy-pw hidden" id="btn-copy-pw" title="Copy to clipboard">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -102,16 +102,16 @@
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
-              Generieren
+              Generate
             </button>
           </div>
-          <p class="opt-hint" style="margin-top:5px" id="pw-hint" class="hidden">DISA STIG · AES-256 · Passwort wird zum Schutz der Datei verwendet.</p>
+          <p class="opt-hint" style="margin-top:5px" id="pw-hint" class="hidden">DISA STIG · AES-256 · Password is used to protect the file.</p>
         </div>
       </div>
 
       <div>
-        <span class="opt-label">Max. Downloads</span>
-        <p class="opt-hint" style="margin-bottom:6px">0 = unbegrenzt</p>
+        <span class="opt-label">Max. downloads</span>
+        <p class="opt-hint" style="margin-bottom:6px">0 = unlimited</p>
         <input type="number" id="max-dl" class="input input-sm" value="0" min="0">
       </div>
 
@@ -123,7 +123,7 @@
         <polyline points="17 8 12 3 7 8"/>
         <line x1="12" y1="3" x2="12" y2="15"/>
       </svg>
-      Hochladen
+      Upload
     </button>
 
   </div>
@@ -131,18 +131,18 @@
   <!-- My Files section -->
   <div id="my-files-section" class="hidden" style="margin-top:28px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dim)">Meine Dateien</span>
+      <span style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dim)">My Files</span>
       <div style="display:flex;align-items:center;gap:8px">
         <!-- View toggle: list / gallery -->
         <div id="view-toggle" style="display:none;align-items:center;gap:2px;background:var(--card-bg,rgba(255,255,255,.05));border:1px solid var(--border,rgba(255,255,255,.08));border-radius:999px;padding:2px">
-          <button id="btn-view-list" title="Listenansicht" class="view-btn active" onclick="setView('list')">
+          <button id="btn-view-list" title="List view" class="view-btn active" onclick="setView('list')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
           </button>
-          <button id="btn-view-gallery" title="Fotoalbum" class="view-btn" onclick="setView('gallery')">
+          <button id="btn-view-gallery" title="Photo album" class="view-btn" onclick="setView('gallery')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
           </button>
         </div>
-        <button id="btn-refresh-files" title="Aktualisieren" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;display:flex;align-items:center;transition:color .15s" onmouseover="this.style.color='var(--dim)'" onmouseout="this.style.color='var(--muted)'">
+        <button id="btn-refresh-files" title="Refresh" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;display:flex;align-items:center;transition:color .15s" onmouseover="this.style.color='var(--dim)'" onmouseout="this.style.color='var(--muted)'">
           <svg id="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         </button>
       </div>
@@ -174,17 +174,17 @@
       <span class="prog-pct"  id="prog-pct">0 %</span>
     </div>
     <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
-    <p class="prog-status" id="prog-status">Wird vorbereitet …</p>
+    <p class="prog-status" id="prog-status">Preparing …</p>
     <p class="prog-speed"  id="prog-speed"></p>
   </div>
 
   <!-- Success card -->
   <div class="card hidden" id="card-success">
     <div class="success-icon" id="success-icon">✓</div>
-    <h2 class="success-title" id="success-title">Upload erfolgreich!</h2>
-    <p class="success-subtitle" id="success-subtitle">Link kopieren und teilen.</p>
+    <h2 class="success-title" id="success-title">Upload successful!</h2>
+    <p class="success-subtitle" id="success-subtitle">Copy link and share.</p>
     <div id="success-results"></div>
-    <button class="btn-ghost mt" id="btn-new">Weitere Dateien hochladen</button>
+    <button class="btn-ghost mt" id="btn-new">Upload more files</button>
   </div>
 
 </main>
@@ -210,7 +210,7 @@ const $ = id => document.getElementById(id);
 
     if (user.isGuest) {
       $('guest-banner').classList.remove('hidden');
-      // Lock pills to ≤ 4h, disable Unbegrenzt and longer options
+      // Lock pills to ≤ 4h, disable Unlimited and longer options
       document.querySelectorAll('.pill').forEach(p => {
         const s = parseInt(p.dataset.s);
         if (s === 0 || s > 14400) {
@@ -253,16 +253,16 @@ dz.addEventListener('dragover', e => {
     const entry = i.webkitGetAsEntry && i.webkitGetAsEntry();
     return entry && entry.isDirectory;
   });
-  $('drop-title').textContent = hasDir ? 'Ordner hier ablegen' : 'Datei oder Ordner ablegen';
+  $('drop-title').textContent = hasDir ? 'Drop folder here' : 'Drop file or folder here';
 });
 dz.addEventListener('dragleave', () => {
   dz.classList.remove('over');
-  $('drop-title').textContent = 'Datei oder Ordner ablegen';
+  $('drop-title').textContent = 'Drop file or folder here';
 });
 dz.addEventListener('drop', async e => {
   e.preventDefault();
   dz.classList.remove('over');
-  $('drop-title').textContent = 'Datei oder Ordner ablegen';
+  $('drop-title').textContent = 'Drop file or folder here';
   if (!e.dataTransfer.items || e.dataTransfer.items.length === 0) return;
 
   // Process all dropped items (files + folders) in parallel
@@ -278,7 +278,7 @@ dz.addEventListener('drop', async e => {
   await Promise.all(promises);
 });
 dz.addEventListener('click', e => {
-  // Nicht feuern wenn ein interaktives Element innerhalb der Zone geklickt wurde
+  // Don't fire if an interactive element inside the zone was clicked
   if (e.target.closest('label, [role="button"], input, button')) return;
   $('file-input').click();
 });
@@ -287,7 +287,7 @@ $('file-input').addEventListener('change', e => {
   e.target.value = '';
 });
 
-// "Ordner auswählen" — stopPropagation verhindert Weiterleitung an dz-Handler
+// "Choose folder" — stopPropagation prevents forwarding to dz handler
 $('btn-folder-pick').addEventListener('click', e => {
   e.stopPropagation();
   selectFolderPicker();
@@ -298,20 +298,20 @@ $('btn-folder-pick').addEventListener('keydown', e => {
 
 // ── Folder → ZIP ─────────────────────────────────────────────────────────────
 
-// Button-Klick: showDirectoryPicker (Chrome/Edge) mit webkitdirectory-Fallback
+// Button click: showDirectoryPicker (Chrome/Edge) with webkitdirectory fallback
 async function selectFolderPicker() {
   if (window.showDirectoryPicker) {
     try {
       const dirHandle = await window.showDirectoryPicker({ mode: 'read' });
-      showZipProgress(dirHandle.name + '.zip', 'Ordner wird eingelesen …', 0);
+      showZipProgress(dirHandle.name + '.zip', 'Reading folder …', 0);
       const entries = await collectFromHandle(dirHandle, dirHandle.name + '/');
       await zipAndSetFile(entries, dirHandle.name);
     } catch (e) {
-      if (e.name !== 'AbortError') { show('card-upload'); alert('Fehler: ' + e.message); }
+      if (e.name !== 'AbortError') { show('card-upload'); alert('Error: ' + e.message); }
       else show('card-upload');
     }
   } else {
-    // Fallback für Firefox / ältere Browser
+    // Fallback for Firefox / older browsers
     const input = document.createElement('input');
     input.type = 'file';
     input.webkitdirectory = true;
@@ -321,7 +321,7 @@ async function selectFolderPicker() {
       const files = input.files;
       document.body.removeChild(input);
       if (!files || !files.length) return;
-      const folderName = files[0].webkitRelativePath.split('/')[0] || 'ordner';
+      const folderName = files[0].webkitRelativePath.split('/')[0] || 'folder';
       const entries = Array.from(files).map(f => ({ path: f.webkitRelativePath, file: f }));
       await zipAndSetFile(entries, folderName);
     });
@@ -329,19 +329,19 @@ async function selectFolderPicker() {
   }
 }
 
-// Drag & Drop eines Ordners über DataTransferItem.webkitGetAsEntry()
+// Drag & Drop of a folder via DataTransferItem.webkitGetAsEntry()
 async function handleFolderEntry(dirEntry) {
-  showZipProgress(dirEntry.name + '.zip', 'Ordner wird eingelesen …', 0);
+  showZipProgress(dirEntry.name + '.zip', 'Reading folder …', 0);
   try {
     const entries = await collectFromLegacyEntry(dirEntry, dirEntry.name + '/');
     await zipAndSetFile(entries, dirEntry.name);
   } catch (err) {
     show('card-upload');
-    alert('Fehler beim Lesen des Ordners: ' + err.message);
+    alert('Error reading folder: ' + err.message);
   }
 }
 
-// File System Access API: rekursiv alle Dateien aus einem DirectoryHandle lesen
+// File System Access API: recursively read all files from a DirectoryHandle
 async function collectFromHandle(dirHandle, basePath) {
   const result = [];
   for await (const [name, handle] of dirHandle.entries()) {
@@ -356,7 +356,7 @@ async function collectFromHandle(dirHandle, basePath) {
   return result;
 }
 
-// Legacy DataTransferItem API (für Drag & Drop)
+// Legacy DataTransferItem API (for Drag & Drop)
 async function collectFromLegacyEntry(dirEntry, basePath) {
   const result = [];
   const reader = dirEntry.createReader();
@@ -380,9 +380,9 @@ async function collectFromLegacyEntry(dirEntry, basePath) {
 }
 
 async function zipAndSetFile(entries, folderName) {
-  if (!entries.length) { alert('Ordner ist leer.'); return; }
+  if (!entries.length) { alert('Folder is empty.'); return; }
 
-  showZipProgress(folderName + '.zip', 'Wird komprimiert …', 0);
+  showZipProgress(folderName + '.zip', 'Compressing …', 0);
 
   try {
     const zip = new JSZip();
@@ -400,7 +400,7 @@ async function zipAndSetFile(entries, folderName) {
     show('card-upload');
   } catch (err) {
     show('card-upload');
-    alert('ZIP-Fehler: ' + err.message);
+    alert('ZIP error: ' + err.message);
   }
 }
 
@@ -421,7 +421,7 @@ function showZipProgress(name, status, pct) {
 function updateZipProgress(pct) {
   $('prog-pct').textContent  = Math.round(pct) + ' %';
   $('prog-fill').style.width = pct + '%';
-  $('prog-status').textContent = pct < 100 ? 'Wird komprimiert …' : 'ZIP fertig …';
+  $('prog-status').textContent = pct < 100 ? 'Compressing …' : 'ZIP ready …';
 }
 
 function addToQueue(f) {
@@ -453,13 +453,13 @@ function renderFileList() {
         <div class="file-item-name">${esc(f.name)}</div>
         <div class="file-item-size">${fmtBytes(f.size)}</div>
       </div>
-      <button class="file-item-rm" data-idx="${i}" title="Entfernen">
+      <button class="file-item-rm" data-idx="${i}" title="Remove">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
     </div>`).join('') +
-    (fileQueue.length > 1 ? `<div class="queue-summary">${fileQueue.length} Dateien · ${fmtBytes(totalSize)} gesamt</div>` : '');
+    (fileQueue.length > 1 ? `<div class="queue-summary">${fileQueue.length} files · ${fmtBytes(totalSize)} total</div>` : '');
   list.querySelectorAll('.file-item-rm').forEach(btn => {
     btn.addEventListener('click', () => {
       fileQueue.splice(parseInt(btn.dataset.idx), 1);
@@ -484,7 +484,7 @@ $('pw-toggle').addEventListener('change', function() {
     generatedPassword = '';
     $('pw-display').value = '';
     $('btn-copy-pw').classList.add('hidden');
-    $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Generieren`;
+    $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Generate`;
   }
 });
 
@@ -493,15 +493,15 @@ $('btn-gen-pw').addEventListener('click', async () => {
   $('btn-gen-pw').innerHTML = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> …';
   try {
     const r = await fetch('/api/password/generate');
-    if (!r.ok) throw new Error('Fehler');
+    if (!r.ok) throw new Error('Error');
     const d = await r.json();
     generatedPassword = d.password;
     $('pw-display').value = d.password;
     $('btn-copy-pw').classList.remove('hidden');
-    $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Neu`;
+    $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Refresh`;
   } catch {
-    alert('Fehler beim Generieren des Passworts.');
-    $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Generieren`;
+    alert('Failed to generate password.');
+    $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Generate`;
   }
   $('btn-gen-pw').disabled = false;
 });
@@ -524,7 +524,7 @@ $('btn-upload').addEventListener('click', async () => {
   let pw = '';
   if (usePassword) {
     if (!generatedPassword) {
-      alert('Bitte zuerst ein STIG-Passwort generieren.');
+      alert('Please generate a STIG password first.');
       return;
     }
     pw = generatedPassword;
@@ -546,7 +546,7 @@ $('btn-upload').addEventListener('click', async () => {
 
     if (total > 1) {
       $('prog-queue').style.display = '';
-      $('prog-queue').textContent = `Datei ${qi + 1} von ${total}`;
+      $('prog-queue').textContent = `File ${qi + 1} of ${total}`;
     } else {
       $('prog-queue').style.display = 'none';
     }
@@ -561,12 +561,12 @@ $('btn-upload').addEventListener('click', async () => {
       if (secs > .5 && bytes > 0) {
         const spd = bytes / secs;
         const rem = f.size > bytes ? (f.size - bytes) / spd : 0;
-        $('prog-speed').textContent = fmtBytes(spd) + '/s · noch ' + fmtDur(rem);
+        $('prog-speed').textContent = fmtBytes(spd) + '/s · ' + fmtDur(rem) + ' left';
       }
     };
 
     try {
-      $('prog-status').textContent = 'Verbindung …';
+      $('prog-status').textContent = 'Connecting …';
       const { sessionId } = await api('/api/upload/init', {
         filename: f.name,
         mimeType: f.type || 'application/octet-stream',
@@ -577,7 +577,7 @@ $('btn-upload').addEventListener('click', async () => {
       });
 
       for (let i = 0; i < chunks; i++) {
-        $('prog-status').textContent = chunks > 1 ? `Chunk ${i+1} / ${chunks}` : 'Wird hochgeladen …';
+        $('prog-status').textContent = chunks > 1 ? `Chunk ${i+1} / ${chunks}` : 'Uploading …';
         const start = i * CHUNK;
         const fd = new FormData();
         fd.append('sessionId', sessionId);
@@ -586,7 +586,7 @@ $('btn-upload').addEventListener('click', async () => {
         await xhrUpload(fd, n => setP(start + n));
       }
 
-      $('prog-status').textContent = pw ? 'Wird verschlüsselt …' : 'Wird abgeschlossen …';
+      $('prog-status').textContent = pw ? 'Encrypting …' : 'Finalizing …';
       setP(f.size);
       const { fileId, expiresAt } = await api('/api/upload/finalize', { sessionId });
       results.push({ name: f.name, size: f.size, fileId, expiresAt, encrypted: !!pw, maxDl });
@@ -612,7 +612,7 @@ $('btn-new').addEventListener('click', () => {
   }
   $('pw-display').value = '';
   $('btn-copy-pw').classList.add('hidden');
-  $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Generieren`;
+  $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Generate`;
   $('max-dl').value = '0';
   $('prog-fill').style.width = '0%';
   $('success-results').innerHTML = '';
@@ -629,33 +629,33 @@ function showResults(results) {
     // Single success: classic layout with big share box
     const r = ok[0];
     const url = location.origin + '/d/' + r.fileId;
-    $('success-title').textContent = 'Upload erfolgreich!';
-    $('success-subtitle').textContent = 'Link kopieren und teilen.';
+    $('success-title').textContent = 'Upload successful!';
+    $('success-subtitle').textContent = 'Copy link and share.';
     container.innerHTML = `
       <div class="share-box">
         <input type="text" class="share-url-input" value="${esc(url)}" readonly>
-        <button class="btn-copy-result">Kopieren</button>
+        <button class="btn-copy-result">Copy</button>
       </div>
       <div class="result-meta">
-        <div class="meta-row"><span class="meta-label">Datei</span><span class="meta-value">${esc(r.name)}</span></div>
-        <div class="meta-row"><span class="meta-label">Größe</span><span class="meta-value">${fmtBytes(r.size)}</span></div>
-        <div class="meta-row"><span class="meta-label">Läuft ab</span><span class="meta-value">${fmtExp(r.expiresAt)}</span></div>
-        <div class="meta-row"><span class="meta-label">Max. Downloads</span><span class="meta-value">${r.maxDl || 'Unbegrenzt'}</span></div>
-        <div class="meta-row"><span class="meta-label">Verschlüsselt</span><span class="meta-value">${r.encrypted ? '✓ AES-256' : '—'}</span></div>
+        <div class="meta-row"><span class="meta-label">File</span><span class="meta-value">${esc(r.name)}</span></div>
+        <div class="meta-row"><span class="meta-label">Size</span><span class="meta-value">${fmtBytes(r.size)}</span></div>
+        <div class="meta-row"><span class="meta-label">Expires</span><span class="meta-value">${fmtExp(r.expiresAt)}</span></div>
+        <div class="meta-row"><span class="meta-label">Max. downloads</span><span class="meta-value">${r.maxDl || 'Unlimited'}</span></div>
+        <div class="meta-row"><span class="meta-label">Encrypted</span><span class="meta-value">${r.encrypted ? '✓ AES-256' : '—'}</span></div>
       </div>`;
     container.querySelector('.btn-copy-result').addEventListener('click', function() {
       navigator.clipboard.writeText(url);
-      this.textContent = '✓ Kopiert';
+      this.textContent = '✓ Copied';
       this.classList.add('copied');
-      setTimeout(() => { this.textContent = 'Kopieren'; this.classList.remove('copied'); }, 2000);
+      setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 2000);
     });
 
   } else {
     // Multi-file layout
     $('success-title').textContent = fail.length === 0
-      ? `${ok.length} Dateien hochgeladen!`
-      : `${ok.length} von ${results.length} erfolgreich`;
-    $('success-subtitle').textContent = ok.length > 0 ? 'Links kopieren und teilen.' : 'Alle Uploads fehlgeschlagen.';
+      ? `${ok.length} files uploaded!`
+      : `${ok.length} of ${results.length} successful`;
+    $('success-subtitle').textContent = ok.length > 0 ? 'Copy links and share.' : 'All uploads failed.';
     container.innerHTML = `<div class="result-list">${results.map(r => {
       if (r.error) {
         return `<div class="result-row result-error">
@@ -673,7 +673,7 @@ function showResults(results) {
         </div>
         <div class="result-link-row">
           <input type="text" class="result-url-input" value="${esc(url)}" readonly>
-          <button class="btn-copy-result" data-url="${esc(url)}">Kopieren</button>
+          <button class="btn-copy-result" data-url="${esc(url)}">Copy</button>
         </div>
       </div>`;
     }).join('')}</div>`;
@@ -708,7 +708,7 @@ function xhrUpload(fd, onProgress) {
     x.open('POST', '/api/upload/chunk');
     x.upload.addEventListener('progress', e => { if (e.lengthComputable) onProgress(e.loaded); });
     x.addEventListener('load', () => x.status < 300 ? res(JSON.parse(x.responseText)) : rej(new Error('HTTP ' + x.status)));
-    x.addEventListener('error', () => rej(new Error('Netzwerkfehler')));
+    x.addEventListener('error', () => rej(new Error('Network error')));
     x.send(fd);
   });
 }
@@ -719,14 +719,14 @@ function fmtBytes(b) {
   return (b / 1024**i).toFixed(i ? 1 : 0) + ' ' + u[i];
 }
 function fmtDur(s) {
-  if (s < 60) return Math.round(s) + ' Sek.';
-  if (s < 3600) return Math.round(s/60) + ' Min.';
-  return (s/3600).toFixed(1) + ' Std.';
+  if (s < 60) return Math.round(s) + ' s';
+  if (s < 3600) return Math.round(s/60) + ' min';
+  return (s/3600).toFixed(1) + ' hrs';
 }
 function fmtExp(ts) {
-  if (ts > Date.now() + 50 * 365 * 24 * 3600 * 1000) return 'Unbegrenzt';
+  if (ts > Date.now() + 50 * 365 * 24 * 3600 * 1000) return 'Unlimited';
   const d = ts - Date.now(), days = Math.floor(d/86400000), hrs = Math.floor((d%86400000)/3600000);
-  return days > 0 ? `in ${days} Tag${days>1?'en':''}` : `in ${hrs} Std.`;
+  return days > 0 ? `in ${days} day${days>1?'s':''}` : `in ${hrs} hr${hrs>1?'s':''}`;
 }
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -765,7 +765,7 @@ async function loadMyFiles() {
 function renderMyFiles(files) {
   const list = $('my-files-list');
   if (files.length === 0) {
-    list.innerHTML = '<div class="my-files-empty">Noch keine aktiven Dateien</div>';
+    list.innerHTML = '<div class="my-files-empty">No active files yet</div>';
     return;
   }
 
@@ -797,12 +797,12 @@ function renderList(files, list) {
           ${f.encrypted ? '<span class="badge-pw">🔒 AES-256</span>' : ''}
         </div>
         <div class="my-file-meta">
-          <span title="Dateigröße">${fmtBytes(f.size)}</span>
-          <span title="Läuft ab in">⏱ ${expLabel}</span>
+          <span title="File size">${fmtBytes(f.size)}</span>
+          <span title="Expires in">⏱ ${expLabel}</span>
           <span title="Downloads">↓ ${dlLabel}</span>
         </div>
       </div>
-      <button class="btn-copy-link" data-url="${esc(url)}" title="Link kopieren">
+      <button class="btn-copy-link" data-url="${esc(url)}" title="Copy link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -817,7 +817,7 @@ function renderList(files, list) {
       navigator.clipboard.writeText(btn.dataset.url);
       const orig = btn.innerHTML;
       btn.classList.add('copied');
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> Kopiert`;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> Copied`;
       setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
     });
   });
@@ -845,7 +845,7 @@ function renderGallery(files, container) {
           <span class="gallery-name">${esc(f.original_name)}</span>
           <span class="gallery-meta">⏱ ${expLabel}</span>
         </div>
-        <button class="gallery-copy" data-url="${esc(location.origin + '/d/' + f.id)}" title="Link kopieren" onclick="event.stopPropagation();copyGalleryLink(this)">
+        <button class="gallery-copy" data-url="${esc(location.origin + '/d/' + f.id)}" title="Copy link" onclick="event.stopPropagation();copyGalleryLink(this)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
       </div>`;
@@ -854,7 +854,7 @@ function renderGallery(files, container) {
   }
 
   if (others.length > 0) {
-    if (imgs.length > 0) html += '<div style="margin-top:14px;margin-bottom:8px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Weitere Dateien</div>';
+    if (imgs.length > 0) html += '<div style="margin-top:14px;margin-bottom:8px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Other files</div>';
     const tmpDiv = document.createElement('div');
     renderList(others, tmpDiv);
     html += tmpDiv.innerHTML;
@@ -868,7 +868,7 @@ function renderGallery(files, container) {
       navigator.clipboard.writeText(btn.dataset.url);
       const orig = btn.innerHTML;
       btn.classList.add('copied');
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> Kopiert`;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> Copied`;
       setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
     });
   });
@@ -915,12 +915,12 @@ document.addEventListener('keydown', e => {
 });
 
 function fmtExpRemaining(ms) {
-  if (ms > 50 * 365 * 24 * 3600 * 1000) return 'Unbegrenzt';
-  if (ms <= 0) return 'abgelaufen';
+  if (ms > 50 * 365 * 24 * 3600 * 1000) return 'Unlimited';
+  if (ms <= 0) return 'expired';
   const d = Math.floor(ms / 86400000);
   const h = Math.floor((ms % 86400000) / 3600000);
   const m = Math.floor((ms % 3600000) / 60000);
-  if (d > 0) return `${d}T ${h}h`;
+  if (d > 0) return `${d}d ${h}h`;
   if (h > 0) return `${h}h ${m}min`;
   return `${m}min`;
 }
@@ -929,7 +929,7 @@ $('btn-refresh-files').addEventListener('click', loadMyFiles);
 
 // ── Theme switcher + Date ─────────────────────────────────────────────────────
 window.fsTheme.renderSwitcher('theme-switcher');
-$('date-chip').textContent = new Date().toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+$('date-chip').textContent = new Date().toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
 </script>
 </body>
 </html>

@@ -223,10 +223,10 @@ function waitUploadThrottle(bytes) {
     `).run(id, hash, salt, Date.now());
     console.log('');
     console.log('╔══════════════════════════════════════════════╗');
-    console.log('║       INITIALER ADMIN-BENUTZER ERSTELLT      ║');
+    console.log('║         INITIAL ADMIN USER CREATED           ║');
     console.log('╠══════════════════════════════════════════════╣');
-    console.log(`║  Benutzername: admin                         ║`);
-    console.log(`║  Passwort:     ${pw}  ║`);
+    console.log(`║  Username: admin                             ║`);
+    console.log(`║  Password: ${pw}  ║`);
     console.log('╚══════════════════════════════════════════════╝');
     console.log('');
   }
@@ -242,12 +242,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 function requireAuth(req, res, next) {
   const token = req.cookies && req.cookies.fs_session;
-  if (!token) return res.status(401).json({ error: 'Nicht eingeloggt' });
+  if (!token) return res.status(401).json({ error: 'Not logged in' });
 
   const session = db.prepare(`
     SELECT s.*,
            COALESCE(u.id,       s.id)     AS uid,
-           COALESCE(u.username, 'Gast')   AS uname,
+           COALESCE(u.username, 'Guest')  AS uname,
            COALESCE(u.role,     'guest')  AS urole,
            COALESCE(u.active,   1)        AS uactive
     FROM auth_sessions s
@@ -257,10 +257,10 @@ function requireAuth(req, res, next) {
 
   if (!session) {
     res.clearCookie('fs_session');
-    return res.status(401).json({ error: 'Session abgelaufen' });
+    return res.status(401).json({ error: 'Session expired' });
   }
   if (!session.is_guest && !session.uactive)
-    return res.status(403).json({ error: 'Konto gesperrt' });
+    return res.status(403).json({ error: 'Account disabled' });
 
   req.user = {
     id:       session.uid,
@@ -273,7 +273,7 @@ function requireAuth(req, res, next) {
 
 function requireAdmin(req, res, next) {
   requireAuth(req, res, () => {
-    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Keine Berechtigung' });
+    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Access denied' });
     next();
   });
 }
@@ -305,13 +305,13 @@ const upload = multer({
 // Login
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Benutzername und Passwort erforderlich' });
+  if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
 
   const user = db.prepare('SELECT * FROM users WHERE username = ? AND active = 1').get(username);
-  if (!user) return res.status(401).json({ error: 'Ungültige Anmeldedaten' });
+  if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
   const hash = crypto.pbkdf2Sync(password, user.password_salt, 100000, 32, 'sha256').toString('hex');
-  if (hash !== user.password_hash) return res.status(401).json({ error: 'Ungültige Anmeldedaten' });
+  if (hash !== user.password_hash) return res.status(401).json({ error: 'Invalid credentials' });
 
   // Delete old sessions for this user to keep it clean
   db.prepare('DELETE FROM auth_sessions WHERE user_id = ? AND expires_at < ?').run(user.id, Date.now());
@@ -383,15 +383,15 @@ app.post('/api/upload/init', requireAuth, (req, res) => {
   const { filename, mimeType, totalChunks, password, expiresIn, maxDownloads } = req.body;
 
   if (!filename || !totalChunks || expiresIn == null) {
-    return res.status(400).json({ error: 'filename, totalChunks und expiresIn sind erforderlich' });
+    return res.status(400).json({ error: 'filename, totalChunks and expiresIn are required' });
   }
 
   // Guest restrictions: max 4h, password mandatory
   if (req.user.isGuest) {
-    if (!password) return res.status(400).json({ error: 'Gäste müssen ein Passwort setzen (Pflicht)' });
+    if (!password) return res.status(400).json({ error: 'Guests must set a password (required)' });
     const maxGuest = 4 * 3600;
     if (parseInt(expiresIn) === 0 || parseInt(expiresIn) > maxGuest) {
-      return res.status(400).json({ error: 'Gäste können Dateien max. 4 Stunden speichern' });
+      return res.status(400).json({ error: 'Guests can store files for a maximum of 4 hours' });
     }
   }
 
@@ -416,11 +416,11 @@ app.post('/api/upload/init', requireAuth, (req, res) => {
 
 // 2. Upload chunk (require Auth)
 app.post('/api/upload/chunk', requireAuth, upload.single('chunk'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Kein Chunk empfangen' });
+  if (!req.file) return res.status(400).json({ error: 'No chunk received' });
 
   const { sessionId, chunkIndex } = req.body;
   const session = db.prepare('SELECT * FROM sessions WHERE id = ? AND user_id = ?').get(sessionId, req.user.id);
-  if (!session) return res.status(404).json({ error: 'Session nicht gefunden' });
+  if (!session) return res.status(404).json({ error: 'Session not found' });
 
   // Apply upload throttle (delays response proportionally to chunk size)
   await waitUploadThrottle(req.file.size);
@@ -437,12 +437,12 @@ app.post('/api/upload/chunk', requireAuth, upload.single('chunk'), async (req, r
 app.post('/api/upload/finalize', requireAuth, async (req, res) => {
   const { sessionId } = req.body;
   const session = db.prepare('SELECT * FROM sessions WHERE id = ? AND user_id = ?').get(sessionId, req.user.id);
-  if (!session) return res.status(404).json({ error: 'Session nicht gefunden' });
+  if (!session) return res.status(404).json({ error: 'Session not found' });
 
   const received = JSON.parse(session.received_chunks);
   if (received.length < session.total_chunks) {
     return res.status(400).json({
-      error: `Unvollständig: ${received.length}/${session.total_chunks} Chunks empfangen`
+      error: `Incomplete: ${received.length}/${session.total_chunks} chunks received`
     });
   }
 
@@ -489,7 +489,7 @@ app.post('/api/upload/finalize', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('Finalize error:', err);
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    res.status(500).json({ error: 'Verarbeitung fehlgeschlagen' });
+    res.status(500).json({ error: 'Processing failed' });
   }
 });
 
@@ -503,8 +503,8 @@ app.get('/api/info/:id', (req, res) => {
     FROM files WHERE id = ?
   `).get(req.params.id);
 
-  if (!file) return res.status(404).json({ error: 'Nicht gefunden' });
-  if (Date.now() > file.expires_at) return res.status(410).json({ error: 'Abgelaufen' });
+  if (!file) return res.status(404).json({ error: 'Not found' });
+  if (Date.now() > file.expires_at) return res.status(410).json({ error: 'Expired' });
 
   res.json({
     id: file.id,
@@ -536,19 +536,19 @@ app.get('/api/download/:id', (req, res) => {
 
   const file = db.prepare('SELECT * FROM files WHERE id = ?').get(req.params.id);
 
-  if (!file) return res.status(404).json({ error: 'Nicht gefunden' });
-  if (Date.now() > file.expires_at) return res.status(410).json({ error: 'Abgelaufen' });
+  if (!file) return res.status(404).json({ error: 'Not found' });
+  if (Date.now() > file.expires_at) return res.status(410).json({ error: 'Expired' });
 
   const password = req.query.password;
 
   if (file.encrypted) {
-    if (!password) return res.status(401).json({ error: 'Passwort erforderlich' });
+    if (!password) return res.status(401).json({ error: 'Password required' });
     const hash = crypto.createHash('sha256').update(password + file.password_salt).digest('hex');
-    if (hash !== file.password_hash) return res.status(401).json({ error: 'Falsches Passwort' });
+    if (hash !== file.password_hash) return res.status(401).json({ error: 'Wrong password' });
   }
 
   const filePath = path.join(FILES_DIR, file.id);
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Datei fehlt' });
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File missing' });
 
   const result = db.prepare(`
     UPDATE files
@@ -559,7 +559,7 @@ app.get('/api/download/:id', (req, res) => {
   `).run(file.id, Date.now());
 
   if (result.changes === 0) {
-    return res.status(410).json({ error: 'Download-Limit erreicht' });
+    return res.status(410).json({ error: 'Download limit reached' });
   }
 
   res.setHeader('Content-Disposition',
@@ -603,7 +603,7 @@ app.get('/api/preview/:id', (req, res) => {
   const file = db.prepare('SELECT * FROM files WHERE id = ?').get(req.params.id);
   if (!file) return res.status(404).end();
   if (Date.now() > file.expires_at) return res.status(410).end();
-  if (file.encrypted) return res.status(403).json({ error: 'Verschlüsselt – kein Vorschau möglich' });
+  if (file.encrypted) return res.status(403).json({ error: 'Encrypted – preview not available' });
   const mime = file.mime_type || '';
   if (!mime.startsWith('image/')) return res.status(415).end();
   const filePath = path.join(FILES_DIR, file.id);
@@ -616,15 +616,15 @@ app.get('/api/preview/:id', (req, res) => {
 // 6. Verify password (public)
 app.post('/api/verify/:id', (req, res) => {
   const file = db.prepare('SELECT * FROM files WHERE id = ?').get(req.params.id);
-  if (!file) return res.status(404).json({ error: 'Nicht gefunden' });
-  if (Date.now() > file.expires_at) return res.status(410).json({ error: 'Abgelaufen' });
+  if (!file) return res.status(404).json({ error: 'Not found' });
+  if (Date.now() > file.expires_at) return res.status(410).json({ error: 'Expired' });
 
   if (!file.encrypted) return res.json({ ok: true });
 
   const { password } = req.body;
-  if (!password) return res.status(401).json({ error: 'Passwort erforderlich' });
+  if (!password) return res.status(401).json({ error: 'Password required' });
   const hash = crypto.createHash('sha256').update(password + file.password_salt).digest('hex');
-  if (hash !== file.password_hash) return res.status(401).json({ error: 'Falsches Passwort' });
+  if (hash !== file.password_hash) return res.status(401).json({ error: 'Wrong password' });
   res.json({ ok: true });
 });
 
@@ -647,7 +647,7 @@ app.get('/api/admin/transfers', requireAdmin, (_req, res) => {
     SELECT f.id, f.original_name, f.size, f.created_at, f.expires_at,
            f.download_count, f.max_downloads, f.encrypted, f.uploader_ip,
            f.user_id,
-           COALESCE(u.username, 'Gast') AS uploader,
+           COALESCE(u.username, 'Guest') AS uploader,
            CASE WHEN f.user_id IS NULL THEN 1 ELSE 0 END AS is_guest
     FROM files f
     LEFT JOIN users u ON u.id = f.user_id
@@ -661,11 +661,11 @@ app.get('/api/admin/transfers', requireAdmin, (_req, res) => {
 app.delete('/api/admin/anon-log/:id', requireAdmin, (req, res) => {
   const { id } = req.params;
   const file = db.prepare('SELECT id, original_name FROM files WHERE id = ?').get(id);
-  if (!file) return res.status(404).json({ error: 'Nicht gefunden' });
+  if (!file) return res.status(404).json({ error: 'Not found' });
   const fp = path.join(FILES_DIR, id);
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
   db.prepare('DELETE FROM files WHERE id = ?').run(id);
-  logEvent('file_deleted_admin', `Admin "${req.user.username}" löschte Datei: ${file.original_name}`, { fileId: id });
+  logEvent('file_deleted_admin', `Admin "${req.user.username}" deleted file: ${file.original_name}`, { fileId: id });
   res.json({ ok: true });
 });
 
@@ -673,7 +673,7 @@ app.delete('/api/admin/anon-log/:id', requireAdmin, (req, res) => {
 
 app.get('/api/admin/storage', requireAdmin, (_req, res) => {
   const rows = db.prepare(`
-    SELECT COALESCE(u.username, '(gelöscht)') AS username,
+    SELECT COALESCE(u.username, '(deleted)') AS username,
            COUNT(f.id)            AS file_count,
            COALESCE(SUM(f.size), 0) AS used_bytes
     FROM files f
@@ -698,7 +698,7 @@ app.get('/api/admin/settings', requireAdmin, (_req, res) => {
 app.put('/api/admin/settings', requireAdmin, (req, res) => {
   const dl = parseInt(req.body.download_limit_kbps) || 0;
   const ul = parseInt(req.body.upload_limit_kbps)   || 0;
-  if (dl < 0 || ul < 0) return res.status(400).json({ error: 'Negative Werte nicht erlaubt' });
+  if (dl < 0 || ul < 0) return res.status(400).json({ error: 'Negative values not allowed' });
   setSetting('download_limit_kbps', dl);
   setSetting('upload_limit_kbps',   ul);
   // reset upload bucket so new setting takes effect immediately
@@ -744,11 +744,11 @@ app.get('/api/admin/users', requireAdmin, (_req, res) => {
 app.post('/api/admin/users', requireAdmin, (req, res) => {
   const { username } = req.body;
   if (!username || username.trim().length < 2) {
-    return res.status(400).json({ error: 'Benutzername muss mindestens 2 Zeichen lang sein' });
+    return res.status(400).json({ error: 'Username must be at least 2 characters' });
   }
   const trimmed = username.trim().toLowerCase();
   const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(trimmed);
-  if (existing) return res.status(409).json({ error: 'Benutzername bereits vergeben' });
+  if (existing) return res.status(409).json({ error: 'Username already taken' });
 
   const pw = generateStigPassword();
   const salt = crypto.randomBytes(32).toString('hex');
@@ -767,7 +767,7 @@ app.post('/api/admin/users', requireAdmin, (req, res) => {
 app.patch('/api/admin/users/:id', requireAdmin, (req, res) => {
   const { id } = req.params;
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
-  if (!user) return res.status(404).json({ error: 'Benutzer nicht gefunden' });
+  if (!user) return res.status(404).json({ error: 'User not found' });
 
   const { action } = req.body;
 
@@ -789,15 +789,15 @@ app.patch('/api/admin/users/:id', requireAdmin, (req, res) => {
     return res.json({ ok: true, password: pw });
   }
 
-  res.status(400).json({ error: 'Unbekannte Aktion' });
+  res.status(400).json({ error: 'Unknown action' });
 });
 
 // Delete user
 app.delete('/api/admin/users/:id', requireAdmin, (req, res) => {
   const { id } = req.params;
-  if (req.user.id === id) return res.status(400).json({ error: 'Eigenen Account nicht löschbar' });
+  if (req.user.id === id) return res.status(400).json({ error: 'Cannot delete own account' });
   const user = db.prepare('SELECT id FROM users WHERE id = ?').get(id);
-  if (!user) return res.status(404).json({ error: 'Benutzer nicht gefunden' });
+  if (!user) return res.status(404).json({ error: 'User not found' });
   db.prepare('DELETE FROM auth_sessions WHERE user_id = ?').run(id);
   db.prepare('DELETE FROM users WHERE id = ?').run(id);
   res.json({ ok: true });
@@ -820,7 +820,7 @@ app.get('/api/admin/files', requireAdmin, (_req, res) => {
 app.post('/api/admin/files/bulk-delete', requireAdmin, (req, res) => {
   const { ids } = req.body;
   if (!Array.isArray(ids) || ids.length === 0) {
-    return res.status(400).json({ error: 'Keine IDs angegeben' });
+    return res.status(400).json({ error: 'No IDs provided' });
   }
   let deleted = 0;
   const deletedNames = [];
@@ -835,23 +835,23 @@ app.post('/api/admin/files/bulk-delete', requireAdmin, (req, res) => {
     deleted++;
   }
   if (deleted > 0)
-    logEvent('files_deleted_admin', `Admin "${req.user.username}" löschte ${deleted} Datei(en) (Bulk)`, { count: deleted, names: deletedNames });
+    logEvent('files_deleted_admin', `Admin "${req.user.username}" deleted ${deleted} file(s) (bulk)`, { count: deleted, names: deletedNames });
   res.json({ ok: true, deleted });
 });
 
 // Admin download – no counter increment, admin auth required
 app.get('/api/admin/download/:id', requireAdmin, (req, res) => {
   const file = db.prepare('SELECT * FROM files WHERE id = ?').get(req.params.id);
-  if (!file) return res.status(404).json({ error: 'Nicht gefunden' });
+  if (!file) return res.status(404).json({ error: 'Not found' });
 
   const filePath = path.join(FILES_DIR, file.id);
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Datei fehlt' });
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File missing' });
 
   if (file.encrypted) {
     const password = req.query.password;
-    if (!password) return res.status(401).json({ error: 'Passwort erforderlich', encrypted: true });
+    if (!password) return res.status(401).json({ error: 'Password required', encrypted: true });
     const hash = crypto.createHash('sha256').update(password + file.password_salt).digest('hex');
-    if (hash !== file.password_hash) return res.status(401).json({ error: 'Falsches Passwort' });
+    if (hash !== file.password_hash) return res.status(401).json({ error: 'Wrong password' });
 
     noCache(res);
     res.setHeader('Content-Disposition',
@@ -885,11 +885,11 @@ app.get('/api/admin/download/:id', requireAdmin, (req, res) => {
 app.delete('/api/admin/files/:id', requireAdmin, (req, res) => {
   const { id } = req.params;
   const file = db.prepare('SELECT id, original_name FROM files WHERE id = ?').get(id);
-  if (!file) return res.status(404).json({ error: 'Datei nicht gefunden' });
+  if (!file) return res.status(404).json({ error: 'File not found' });
   const fp = path.join(FILES_DIR, id);
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
   db.prepare('DELETE FROM files WHERE id = ?').run(id);
-  logEvent('file_deleted_admin', `Admin "${req.user.username}" löschte Datei: ${file.original_name}`, { fileId: id });
+  logEvent('file_deleted_admin', `Admin "${req.user.username}" deleted file: ${file.original_name}`, { fileId: id });
   res.json({ ok: true });
 });
 
@@ -905,8 +905,8 @@ app.get('/api/admin/syslog', requireAdmin, (_req, res) => {
 // Create a secret (auth required)
 app.post('/api/secret', requireAuth, (req, res) => {
   const { content, viewsMax, expiresIn, passphrase } = req.body;
-  if (!content || !String(content).trim()) return res.status(400).json({ error: 'Inhalt darf nicht leer sein' });
-  if (String(content).length > 50000) return res.status(400).json({ error: 'Inhalt zu lang (max. 50.000 Zeichen)' });
+  if (!content || !String(content).trim()) return res.status(400).json({ error: 'Content must not be empty' });
+  if (String(content).length > 50000) return res.status(400).json({ error: 'Content too long (max. 50,000 characters)' });
 
   const token = crypto.randomBytes(32).toString('hex');
   const now   = Date.now();
@@ -925,7 +925,7 @@ app.post('/api/secret', requireAuth, (req, res) => {
   `).run(token, String(content).trim(), vmax, now + ttl * 1000, now, req.user.id, passphraseHash, passphraseSalt);
 
   logEvent('secret_created',
-    `Geheimnis erstellt von "${req.user.username}" (${vmax} Ansicht${vmax > 1 ? 'en' : ''}, TTL ${ttl}s)`,
+    `Secret created by "${req.user.username}" (${vmax} view${vmax > 1 ? 's' : ''}, TTL ${ttl}s)`,
     { tokenPrefix: token.substring(0, 8), user: req.user.username, viewsMax: vmax });
 
   res.json({ token, url: '/p/' + token });
@@ -934,12 +934,12 @@ app.post('/api/secret', requireAuth, (req, res) => {
 // Get secret info (public — does NOT consume a view)
 app.get('/api/secret/:token/info', (req, res) => {
   const { token } = req.params;
-  if (!/^[0-9a-f]{64}$/.test(token)) return res.status(400).json({ error: 'Ungültiger Token' });
+  if (!/^[0-9a-f]{64}$/.test(token)) return res.status(400).json({ error: 'Invalid token' });
   const s = db.prepare('SELECT token, expires_at, views_max, views_used, passphrase_hash FROM secrets WHERE token = ?').get(token);
-  if (!s) return res.status(404).json({ error: 'Nicht gefunden oder bereits abgerufen' });
+  if (!s) return res.status(404).json({ error: 'Not found or already retrieved' });
   if (Date.now() > s.expires_at) {
     db.prepare('DELETE FROM secrets WHERE token = ?').run(token);
-    return res.status(410).json({ error: 'Abgelaufen' });
+    return res.status(410).json({ error: 'Expired' });
   }
   res.json({
     exists: true,
@@ -954,20 +954,20 @@ app.get('/api/secret/:token/info', (req, res) => {
 // Reveal secret (public — consumes one view)
 app.post('/api/secret/:token', (req, res) => {
   const { token } = req.params;
-  if (!/^[0-9a-f]{64}$/.test(token)) return res.status(400).json({ error: 'Ungültiger Token' });
+  if (!/^[0-9a-f]{64}$/.test(token)) return res.status(400).json({ error: 'Invalid token' });
 
   const s = db.prepare('SELECT * FROM secrets WHERE token = ?').get(token);
-  if (!s) return res.status(404).json({ error: 'Nicht gefunden oder bereits abgerufen' });
+  if (!s) return res.status(404).json({ error: 'Not found or already retrieved' });
   if (Date.now() > s.expires_at) {
     db.prepare('DELETE FROM secrets WHERE token = ?').run(token);
-    return res.status(410).json({ error: 'Abgelaufen' });
+    return res.status(410).json({ error: 'Expired' });
   }
 
   if (s.passphrase_hash) {
     const { passphrase } = req.body;
-    if (!passphrase) return res.status(401).json({ error: 'Passwort erforderlich', passphraseRequired: true });
+    if (!passphrase) return res.status(401).json({ error: 'Password required', passphraseRequired: true });
     const hash = crypto.pbkdf2Sync(String(passphrase), s.passphrase_salt, 100000, 32, 'sha256').toString('hex');
-    if (hash !== s.passphrase_hash) return res.status(401).json({ error: 'Falsches Passwort' });
+    if (hash !== s.passphrase_hash) return res.status(401).json({ error: 'Wrong password' });
   }
 
   const newUsed = s.views_used + 1;
@@ -976,7 +976,7 @@ app.post('/api/secret/:token', (req, res) => {
   if (destroyed) {
     db.prepare('DELETE FROM secrets WHERE token = ?').run(token);
     logEvent('secret_viewed',
-      `Geheimnis abgerufen und gelöscht (${newUsed}/${s.views_max} Ansichten verbraucht)`,
+      `Secret retrieved and deleted (${newUsed}/${s.views_max} views used)`,
       { tokenPrefix: token.substring(0, 8) });
   } else {
     db.prepare('UPDATE secrets SET views_used = ? WHERE token = ?').run(newUsed, token);
@@ -1063,9 +1063,9 @@ function cleanup() {
   if (expiredFiles.length) {
     db.prepare('DELETE FROM files WHERE expires_at < ?').run(now);
     logEvent('file_expired',
-      `${expiredFiles.length} abgelaufene Datei(en) automatisch gelöscht`,
+      `${expiredFiles.length} expired file(s) automatically deleted`,
       { count: expiredFiles.length, names: expiredFiles.map(f => f.original_name) });
-    console.log(`[cleanup] ${expiredFiles.length} abgelaufene Datei(en) gelöscht`);
+    console.log(`[cleanup] ${expiredFiles.length} expired file(s) deleted`);
   }
 
   const cutoff = now - 24 * 3600 * 1000;
@@ -1076,7 +1076,7 @@ function cleanup() {
   }
   if (oldSessions.length) {
     db.prepare('DELETE FROM sessions WHERE created_at < ?').run(cutoff);
-    console.log(`[cleanup] ${oldSessions.length} veraltete Session(s) gelöscht`);
+    console.log(`[cleanup] ${oldSessions.length} stale session(s) deleted`);
   }
 
   // Cleanup expired auth sessions
@@ -1087,9 +1087,9 @@ function cleanup() {
   if (expiredSecrets.length) {
     db.prepare('DELETE FROM secrets WHERE expires_at < ?').run(now);
     logEvent('secret_expired',
-      `${expiredSecrets.length} abgelaufene Geheimnis(se) gelöscht`,
+      `${expiredSecrets.length} expired secret(s) deleted`,
       { count: expiredSecrets.length });
-    console.log(`[cleanup] ${expiredSecrets.length} abgelaufene Geheimnis(se) gelöscht`);
+    console.log(`[cleanup] ${expiredSecrets.length} expired secret(s) deleted`);
   }
 }
 
@@ -1099,6 +1099,6 @@ setInterval(cleanup, 60 * 60 * 1000);
 // ── Start ─────────────────────────────────────────────────────────────────────
 
 app.listen(PORT, () => {
-  console.log(`SafeDrop läuft auf Port ${PORT}`);
-  logEvent('server_start', `SafeDrop-Server gestartet auf Port ${PORT}`, { port: PORT });
+  console.log(`SafeDrop running on port ${PORT}`);
+  logEvent('server_start', `SafeDrop server started on port ${PORT}`, { port: PORT });
 });

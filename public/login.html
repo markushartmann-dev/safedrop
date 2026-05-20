@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login – SafeDrop</title>
+  <title>Sign In – SafeDrop</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script src="/theme.js"></script>
   <style>
@@ -205,8 +205,8 @@
   <div class="card">
     <div class="stripe"></div>
     <div class="body">
-      <div class="card-title">Anmelden</div>
-      <div class="card-sub">Bitte mit deinem Konto einloggen.</div>
+      <div class="card-title">Sign In</div>
+      <div class="card-sub">Please sign in with your account.</div>
 
       <div class="error-box hidden" id="err-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -219,12 +219,12 @@
 
       <form id="login-form" autocomplete="on">
         <div class="field">
-          <label for="username">Benutzername</label>
+          <label for="username">Username</label>
           <input class="input" type="text" id="username" name="username"
-                 placeholder="benutzername" autocomplete="username" required autofocus>
+                 placeholder="username" autocomplete="username" required autofocus>
         </div>
         <div class="field">
-          <label for="password">Passwort</label>
+          <label for="password">Password</label>
           <input class="input" type="password" id="password" name="password"
                  placeholder="••••••••••••" autocomplete="current-password" required>
         </div>
@@ -236,13 +236,13 @@
             <polyline points="10 17 15 12 10 7"/>
             <line x1="15" y1="12" x2="3" y2="12"/>
           </svg>
-          Anmelden
+          Sign In
         </button>
       </form>
 
       <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
         <div style="flex:1;height:1px;background:var(--bdr)"></div>
-        <span style="font-size:.7rem;color:var(--mt)">oder</span>
+        <span style="font-size:.7rem;color:var(--mt)">or</span>
         <div style="flex:1;height:1px;background:var(--bdr)"></div>
       </div>
 
@@ -253,7 +253,7 @@
           <line x1="12" y1="11" x2="12" y2="16"/>
           <line x1="9" y1="14" x2="15" y2="14"/>
         </svg>
-        Anonym hochladen <span style="font-size:.7rem;opacity:.7">(4h · Passwort Pflicht)</span>
+        Upload anonymously <span style="font-size:.7rem;opacity:.7">(4h · password required)</span>
       </button>
     </div>
   </div>
@@ -263,7 +263,7 @@
 <script>
   window.fsTheme.renderSwitcher('theme-switcher');
   document.getElementById('date-line').textContent =
-    new Date().toLocaleDateString('de-DE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 
   document.getElementById('btn-guest').addEventListener('click', async () => {
     const btn = document.getElementById('btn-guest');
@@ -275,11 +275,11 @@
         location.replace('/');
       } else {
         const d = await r.json().catch(() => ({}));
-        showErr(d.error || 'Gast-Login fehlgeschlagen (HTTP ' + r.status + ')');
+        showErr(d.error || 'Guest login failed (HTTP ' + r.status + ')');
         btn.disabled = false; btn.style.opacity = '';
       }
     } catch {
-      showErr('Verbindungsfehler – Server nicht erreichbar.');
+      showErr('Connection error – server not reachable.');
       btn.disabled = false; btn.style.opacity = '';
     }
   });
@@ -305,8 +305,8 @@
   function setBusy(on) {
     btn.disabled = on;
     btn.innerHTML = on
-      ? '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Wird angemeldet …'
-      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Anmelden';
+      ? '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Signing in …'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In';
   }
 
   form.addEventListener('submit', async e => {
@@ -314,7 +314,7 @@
     errBox.classList.add('hidden');
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
-    if (!username || !password) { showErr('Bitte alle Felder ausfüllen.'); return; }
+    if (!username || !password) { showErr('Please fill in all fields.'); return; }
 
     setBusy(true);
     try {
@@ -324,7 +324,7 @@
         body: JSON.stringify({ username, password })
       });
       const d = await r.json();
-      if (!r.ok) { showErr(d.error || 'Login fehlgeschlagen.'); setBusy(false); return; }
+      if (!r.ok) { showErr(d.error || 'Sign-in failed.'); setBusy(false); return; }
       // Redirect – admin goes to /admin, users go to /
       location.replace(d.role === 'admin' ? '/admin' : '/');
     } catch {
