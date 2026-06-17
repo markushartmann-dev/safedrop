@@ -23,28 +23,41 @@ const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
 
 // ── STIG Password Generator ───────────────────────────────────────────────────
 
-function generateStigPassword() {
-  const upper   = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-  const lower   = 'abcdefghjkmnpqrstuvwxyz';
-  const digits  = '23456789';
-  const special = '!@#$%^&*()-_=+[]{}|;:,.<>?';
-  const all     = upper + lower + digits + special;
-
-  // 2 guaranteed from each category
+function _stigCore(upper, lower, digits, special) {
+  const all = upper + lower + digits + special;
   const chars = [
-    upper[crypto.randomInt(upper.length)],   upper[crypto.randomInt(upper.length)],
-    lower[crypto.randomInt(lower.length)],   lower[crypto.randomInt(lower.length)],
-    digits[crypto.randomInt(digits.length)], digits[crypto.randomInt(digits.length)],
+    upper[crypto.randomInt(upper.length)],     upper[crypto.randomInt(upper.length)],
+    lower[crypto.randomInt(lower.length)],     lower[crypto.randomInt(lower.length)],
+    digits[crypto.randomInt(digits.length)],   digits[crypto.randomInt(digits.length)],
     special[crypto.randomInt(special.length)], special[crypto.randomInt(special.length)],
   ];
-  // fill to 20 chars
   while (chars.length < 20) chars.push(all[crypto.randomInt(all.length)]);
-  // Fisher-Yates shuffle with crypto random
   for (let i = chars.length - 1; i > 0; i--) {
     const j = crypto.randomInt(i + 1);
     [chars[i], chars[j]] = [chars[j], chars[i]];
   }
   return chars.join('');
+}
+
+// Full STIG — standard character set
+function generateStigPassword() {
+  return _stigCore(
+    'ABCDEFGHJKLMNPQRSTUVWXYZ',
+    'abcdefghjkmnpqrstuvwxyz',
+    '23456789',
+    '!@#$%^&*()-_=+[]{}|;:,.<>?'
+  );
+}
+
+// Simple STIG — no visually ambiguous chars (z Z y Y I i l L O o 0 1),
+// special characters limited to ! and . only
+function generateStigPasswordSimple() {
+  return _stigCore(
+    'ABCDEFGHJKMNPQRSTUVWX',   // removed I L O Y Z
+    'abcdefghjkmnpqrstuvwx',   // removed i l o y z
+    '23456789',
+    '!.'
+  );
 }
 
 // ── Database ─────────────────────────────────────────────────────────────────
@@ -408,8 +421,12 @@ app.post('/api/auth/guest', (req, res) => {
 });
 
 // Generate STIG password (authenticated users only)
-app.get('/api/password/generate', requireAuth, (_req, res) => {
-  res.json({ password: generateStigPassword() });
+// ?type=simple → no ambiguous chars, special: ! and . only
+app.get('/api/password/generate', requireAuth, (req, res) => {
+  const pw = req.query.type === 'simple'
+    ? generateStigPasswordSimple()
+    : generateStigPassword();
+  res.json({ password: pw });
 });
 
 // ── Upload Routes (require Auth) ──────────────────────────────────────────────

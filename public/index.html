@@ -185,12 +185,19 @@
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
             </button>
-            <button class="btn-gen-pw" id="btn-gen-pw" type="button">
+            <button class="btn-gen-pw" id="btn-gen-pw" type="button" title="Full STIG — all character classes">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
               Generate
+            </button>
+            <button class="btn-gen-pw btn-gen-simple" id="btn-gen-pw-simple" type="button" title="Simple STIG — no ambiguous chars (z Z y Y I i l L O o 0), special: ! and . only">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Simple
             </button>
           </div>
           <p class="opt-hint" style="margin-top:5px" id="pw-hint" class="hidden">DISA STIG · AES-256 · Password is used to protect the file.</p>
@@ -605,23 +612,30 @@ $('pw-toggle').addEventListener('change', function() {
   }
 });
 
-$('btn-gen-pw').addEventListener('click', async () => {
-  $('btn-gen-pw').disabled = true;
-  $('btn-gen-pw').innerHTML = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> …';
+async function generatePw(simple = false) {
+  const btn    = simple ? $('btn-gen-pw-simple') : $('btn-gen-pw');
+  const spinSvg = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>';
+  const lockSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  const refreshSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>';
+  const label   = simple ? 'Simple' : 'Generate';
+  btn.disabled  = true;
+  btn.innerHTML = spinSvg + ' …';
   try {
-    const r = await fetch('/api/password/generate');
+    const r = await fetch('/api/password/generate' + (simple ? '?type=simple' : ''));
     if (!r.ok) throw new Error('Error');
     const d = await r.json();
     generatedPassword = d.password;
     $('pw-display').value = d.password;
     $('btn-copy-pw').classList.remove('hidden');
-    $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Refresh`;
+    btn.innerHTML = refreshSvg + ' ' + label;
   } catch {
     alert('Failed to generate password.');
-    $('btn-gen-pw').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Generate`;
+    btn.innerHTML = lockSvg + ' ' + label;
   }
-  $('btn-gen-pw').disabled = false;
-});
+  btn.disabled = false;
+}
+$('btn-gen-pw').addEventListener('click', () => generatePw(false));
+$('btn-gen-pw-simple').addEventListener('click', () => generatePw(true));
 
 $('btn-copy-pw').addEventListener('click', () => {
   if (!generatedPassword) return;

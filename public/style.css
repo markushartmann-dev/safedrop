@@ -254,6 +254,18 @@ input[type=number].input::-webkit-outer-spin-button { -webkit-appearance: none; 
 .btn-gen-pw:disabled { opacity: .5; cursor: not-allowed; }
 .btn-gen-pw svg { width: 12px; height: 12px; flex-shrink: 0; }
 
+/* Simple STIG variant — green tint, no ambiguous chars */
+.btn-gen-pw.btn-gen-simple {
+  background: rgba(16,185,129,.08);
+  border-color: rgba(16,185,129,.2);
+  color: #6ee7b7;
+}
+.btn-gen-pw.btn-gen-simple:hover:not(:disabled) {
+  background: rgba(16,185,129,.15);
+  border-color: rgba(16,185,129,.38);
+  color: #a7f3d0;
+}
+
 .pw-generated { display: flex; flex-direction: column; gap: 4px; }
 .pw-gen-row { display: flex; gap: 6px; align-items: center; }
 .pw-gen-row .input { flex: 1; font-size: .8rem; padding: 7px 11px; }
