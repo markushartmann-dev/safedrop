@@ -36,7 +36,8 @@
 - One-time secrets with configurable **view limit** (max. 50) and **TTL**
 - Optional **passphrase** (PBKDF2-secured)
 - Secret is immediately deleted after the last view
-- Dedicated URLs: `/push` to create, `/p/<token>` to retrieve
+- Accessible via the **Password Pusher tab** on the landing page (`/`) or directly at `/push`
+- Deep-link to the tab: `/#pusher`
 
 ### Image Gallery
 - Unencrypted images are displayed as a **gallery view** in the user's file list
