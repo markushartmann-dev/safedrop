@@ -25,17 +25,20 @@ const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
 
 function _stigCore(upper, lower, digits, special) {
   const all = upper + lower + digits + special;
-  const chars = [
-    upper[crypto.randomInt(upper.length)],     upper[crypto.randomInt(upper.length)],
-    lower[crypto.randomInt(lower.length)],     lower[crypto.randomInt(lower.length)],
-    digits[crypto.randomInt(digits.length)],   digits[crypto.randomInt(digits.length)],
-    special[crypto.randomInt(special.length)], special[crypto.randomInt(special.length)],
-  ];
-  while (chars.length < 20) chars.push(all[crypto.randomInt(all.length)]);
-  for (let i = chars.length - 1; i > 0; i--) {
-    const j = crypto.randomInt(i + 1);
-    [chars[i], chars[j]] = [chars[j], chars[i]];
-  }
+  let chars;
+  do {
+    chars = [
+      upper[crypto.randomInt(upper.length)],     upper[crypto.randomInt(upper.length)],
+      lower[crypto.randomInt(lower.length)],     lower[crypto.randomInt(lower.length)],
+      digits[crypto.randomInt(digits.length)],   digits[crypto.randomInt(digits.length)],
+      special[crypto.randomInt(special.length)], special[crypto.randomInt(special.length)],
+    ];
+    while (chars.length < 20) chars.push(all[crypto.randomInt(all.length)]);
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = crypto.randomInt(i + 1);
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+  } while (chars.some((c, i) => i >= 3 && c === chars[i-1] && c === chars[i-2] && c === chars[i-3]));
   return chars.join('');
 }
 
