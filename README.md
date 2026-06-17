@@ -4,6 +4,12 @@
 
 ---
 
+## Screenshot
+
+![SafeDrop landing page](docs/screenshot.svg)
+
+---
+
 ## Features
 
 ### File Upload
