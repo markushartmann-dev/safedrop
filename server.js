@@ -25,6 +25,7 @@ const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
 
 function _stigCore(upper, lower, digits, special) {
   const all = upper + lower + digits + special;
+  const cls = c => upper.includes(c) ? 0 : lower.includes(c) ? 1 : digits.includes(c) ? 2 : 3;
   let chars;
   do {
     chars = [
@@ -38,7 +39,7 @@ function _stigCore(upper, lower, digits, special) {
       const j = crypto.randomInt(i + 1);
       [chars[i], chars[j]] = [chars[j], chars[i]];
     }
-  } while (chars.some((c, i) => i >= 3 && c === chars[i-1] && c === chars[i-2] && c === chars[i-3]));
+  } while (chars.some((c, i) => i >= 3 && cls(c) === cls(chars[i-1]) && cls(c) === cls(chars[i-2]) && cls(c) === cls(chars[i-3])));
   return chars.join('');
 }
 
