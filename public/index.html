@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafeDrop</title>
+  <title>SafeDrop + Password-Push</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script src="/theme.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -170,7 +170,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
       <div class="mode-card-body">
-        <div class="mode-card-title">SafeDrop + Password-Push</div>
+        <div class="mode-card-title">Password Pusher</div>
         <div class="mode-card-desc">Share passwords &amp; secrets via self-destructing one-time links. Auto-deleted after retrieval.</div>
       </div>
     </button>
@@ -388,7 +388,7 @@
           <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
       </div>
-      <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:4px">SafeDrop + Password-Push</h2>
+      <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:4px">Password Pusher</h2>
       <p style="font-size:.8rem;color:var(--muted)">Share secrets securely — self-destructing after retrieval</p>
     </div>
 
@@ -1351,7 +1351,7 @@ function switchTab(tab) {
 }
 if (location.hash === '#pusher') switchTab('pusher');
 
-// ── SafeDrop + Password-Push (inline) ──────────────────────────────────────────────────
+// ── Password Pusher (inline) ──────────────────────────────────────────────────
 let selectedViews  = 1;
 let selectedExpiry = 86400;
 let generatedPP    = '';
