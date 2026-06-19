@@ -178,29 +178,31 @@
     .btn-guest {
       display: flex; align-items: center; gap: 12px;
       width: 100%; margin-top: 10px; padding: 13px 15px;
-      background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.3);
+      background: rgba(245,158,11,.11);
+      border: 2px solid rgba(245,158,11,.5);
       border-radius: 9px; color: var(--dm);
       cursor: pointer; text-align: left;
       transition: all .18s;
+      box-shadow: 0 2px 14px rgba(245,158,11,.15);
     }
     .btn-guest:hover {
-      border-color: rgba(245,158,11,.55); color: #fcd34d;
-      background: rgba(245,158,11,.12);
+      border-color: rgba(245,158,11,.75);
+      background: rgba(245,158,11,.18);
+      box-shadow: 0 4px 22px rgba(245,158,11,.25);
     }
     .btn-guest-icon {
-      flex-shrink: 0; width: 34px; height: 34px; border-radius: 8px;
-      background: rgba(245,158,11,.12);
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(245,158,11,.22);
       display: flex; align-items: center; justify-content: center;
     }
-    .btn-guest-icon svg { width: 16px; height: 16px; }
-    .btn-guest-title { font-size: .85rem; font-weight: 600; line-height: 1.3; }
-    .btn-guest-sub { font-size: .72rem; opacity: .65; margin-top: 2px; }
+    .btn-guest-icon svg { width: 18px; height: 18px; stroke: #f59e0b; }
+    .btn-guest-title { font-size: .88rem; font-weight: 700; color: #d97706; line-height: 1.3; }
+    .btn-guest-sub { font-size: .72rem; opacity: .75; margin-top: 2px; }
     .pp-teaser {
-      display: flex; align-items: center; gap: 5px;
-      margin-top: 9px; font-size: .7rem; color: var(--mt);
-      justify-content: center; line-height: 1.4;
+      display: flex; align-items: flex-start; gap: 5px;
+      margin-top: 9px; font-size: .7rem; color: var(--mt); line-height: 1.5;
     }
-    .pp-teaser svg { width: 11px; height: 11px; flex-shrink: 0; color: #6ee7b7; }
+    .pp-teaser svg { width: 11px; height: 11px; flex-shrink: 0; stroke: #6ee7b7; margin-top: 2px; }
     @media (max-width: 420px) {
       .body { padding: 22px 18px 20px; }
     }
@@ -269,13 +271,13 @@
           </svg>
         </div>
         <div>
-          <div class="btn-guest-title">Upload anonymously</div>
+          <div class="btn-guest-title">Use anonymously</div>
           <div class="btn-guest-sub">4h · password required · no account needed · inkl. STIG-Generator</div>
         </div>
       </button>
       <div class="pp-teaser">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Inkl. <strong style="color:var(--dm)">&nbsp;Password Pusher</strong>&nbsp;— Secrets sicher per One-Time-Link teilen
+        <span>Inkl. <strong>Password Pusher</strong> — Secrets sicher per One-Time-Link teilen</span>
       </div>
     </div>
   </div>
