@@ -176,18 +176,31 @@
       margin-top: 18px; position: relative; z-index: 1;
     }
     .btn-guest {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; margin-top: 10px; padding: 11px;
-      background: none; border: 1px solid var(--bdr);
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; margin-top: 10px; padding: 13px 15px;
+      background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.3);
       border-radius: 9px; color: var(--dm);
-      font-size: .82rem; font-weight: 500; cursor: pointer;
+      cursor: pointer; text-align: left;
       transition: all .18s;
     }
     .btn-guest:hover {
-      border-color: rgba(245,158,11,.35); color: #fcd34d;
-      background: rgba(245,158,11,.05);
+      border-color: rgba(245,158,11,.55); color: #fcd34d;
+      background: rgba(245,158,11,.12);
     }
-    .btn-guest svg { width: 14px; height: 14px; }
+    .btn-guest-icon {
+      flex-shrink: 0; width: 34px; height: 34px; border-radius: 8px;
+      background: rgba(245,158,11,.12);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-guest-icon svg { width: 16px; height: 16px; }
+    .btn-guest-title { font-size: .85rem; font-weight: 600; line-height: 1.3; }
+    .btn-guest-sub { font-size: .72rem; opacity: .65; margin-top: 2px; }
+    .pp-teaser {
+      display: flex; align-items: center; gap: 5px;
+      margin-top: 9px; font-size: .7rem; color: var(--mt);
+      justify-content: center; line-height: 1.4;
+    }
+    .pp-teaser svg { width: 11px; height: 11px; flex-shrink: 0; color: #6ee7b7; }
     @media (max-width: 420px) {
       .body { padding: 22px 18px 20px; }
     }
@@ -247,14 +260,23 @@
       </div>
 
       <button class="btn-guest" id="btn-guest">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-          <line x1="12" y1="11" x2="12" y2="16"/>
-          <line x1="9" y1="14" x2="15" y2="14"/>
-        </svg>
-        Upload anonymously <span style="font-size:.7rem;opacity:.7">(4h · password required)</span>
+        <div class="btn-guest-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+            <line x1="12" y1="11" x2="12" y2="16"/>
+            <line x1="9" y1="14" x2="15" y2="14"/>
+          </svg>
+        </div>
+        <div>
+          <div class="btn-guest-title">Upload anonymously</div>
+          <div class="btn-guest-sub">4h · password required · no account needed</div>
+        </div>
       </button>
+      <div class="pp-teaser">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Inkl. <strong style="color:var(--dm)">&nbsp;SafeDrop + Password-Push</strong>&nbsp;— Secrets sicher per One-Time-Link teilen
+      </div>
     </div>
   </div>
 

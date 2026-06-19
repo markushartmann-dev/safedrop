@@ -1,6 +1,6 @@
 # SafeDrop
 
-**SafeDrop** is a self-hosted file sharing platform with optional AES-256-GCM encryption, user management, and a built-in Password Pusher for one-time secrets. The app runs as a single Docker container with no external dependencies – no cloud, no third-party services.
+**SafeDrop** is a self-hosted file sharing platform with optional AES-256-GCM encryption, user management, and a built-in SafeDrop + Password-Push for one-time secrets. The app runs as a single Docker container with no external dependencies – no cloud, no third-party services.
 
 ---
 
@@ -35,14 +35,14 @@
 | Role | Description |
 |------|-------------|
 | `admin` | Full access to all files, users, logs and settings |
-| `user` | Upload/download own files, Password Pusher |
+| `user` | Upload/download own files, SafeDrop + Password-Push |
 | `guest` | Anonymous session (4 h), password mandatory, no file list |
 
-### Password Pusher
+### SafeDrop + Password-Push
 - One-time secrets with configurable **view limit** (max. 50) and **TTL**
 - Optional **passphrase** (PBKDF2-secured)
 - Secret is immediately deleted after the last view
-- Accessible via the **Password Pusher tab** on the landing page (`/`) or directly at `/push`
+- Accessible via the **SafeDrop + Password-Push tab** on the landing page (`/`) or directly at `/push`
 - Deep-link to the tab: `/#pusher`
 
 ### Image Gallery
